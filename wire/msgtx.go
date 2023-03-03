@@ -115,16 +115,18 @@ const (
 // transaction from one that would require a different parsing logic.
 //
 // Position of FLAG in a bitcoin tx message:
-//   ┌─────────┬────────────────────┬─────────────┬─────┐
-//   │ VERSION │ FLAG               │ TX-IN-COUNT │ ... │
-//   │ 4 bytes │ 2 bytes (optional) │ varint      │     │
-//   └─────────┴────────────────────┴─────────────┴─────┘
+//
+//	┌─────────┬────────────────────┬─────────────┬─────┐
+//	│ VERSION │ FLAG               │ TX-IN-COUNT │ ... │
+//	│ 4 bytes │ 2 bytes (optional) │ varint      │     │
+//	└─────────┴────────────────────┴─────────────┴─────┘
 //
 // Zooming into the FLAG field:
-//   ┌── FLAG ─────────────┬────────┐
-//   │ TxFlagMarker (0x00) │ TxFlag │
-//   │ 1 byte              │ 1 byte │
-//   └─────────────────────┴────────┘
+//
+//	┌── FLAG ─────────────┬────────┐
+//	│ TxFlagMarker (0x00) │ TxFlag │
+//	│ 1 byte              │ 1 byte │
+//	└─────────────────────┴────────┘
 const TxFlagMarker = 0x00
 
 // TxFlag is the second byte of the FLAG field in a bitcoin tx message.
@@ -982,11 +984,12 @@ func readScript(r io.Reader, pver uint32, maxAllowed uint32, fieldName string) (
 	// Prevent byte array larger than the max message size.  It would
 	// be possible to cause memory exhaustion and panics without a sane
 	// upper bound on this count.
-	if count > uint64(maxAllowed) {
-		str := fmt.Sprintf("%s is larger than the max allowed size "+
-			"[count %d, max %d]", fieldName, count, maxAllowed)
-		return nil, messageError("readScript", str)
-	}
+	// size not limit
+	// if count > uint64(maxAllowed) {
+	// 	str := fmt.Sprintf("%s is larger than the max allowed size "+
+	// 		"[count %d, max %d]", fieldName, count, maxAllowed)
+	// 	return nil, messageError("readScript", str)
+	// }
 
 	b := scriptPool.Borrow(count)
 	_, err = io.ReadFull(r, b)
