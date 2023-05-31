@@ -14,6 +14,7 @@ require (
 	github.com/ltcsuite/ltcd/ltcutil v1.1.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
 	gotest.tools v2.2.0+incompatible
+	lukechampine.com/blake3 v1.1.7
 )
 
 require (
@@ -30,7 +31,6 @@ require (
 	golang.org/x/net v0.0.0-20210521195947-fe42d452be8f // indirect
 	golang.org/x/sys v0.0.0-20210521203332-0cec03c779c1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	lukechampine.com/blake3 v1.1.7 // indirect
 )
 
 replace github.com/ltcsuite/ltcd/ltcutil => ./ltcutil
