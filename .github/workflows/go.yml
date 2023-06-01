@@ -51,12 +51,12 @@ jobs:
       - name: Send btcutil coverage
         uses: shogo82148/actions-goveralls@v1
         with:
-          path-to-profile: btcutil/coverage.txt
+          path-to-profile: ltcutil/coverage.txt
 
       - name: Send btcutil coverage for psbt package
         uses: shogo82148/actions-goveralls@v1
         with:
-          path-to-profile: btcutil/psbt/coverage.txt
+          path-to-profile: ltcutil/psbt/coverage.txt
 
   test-race:
     name: Unit race
