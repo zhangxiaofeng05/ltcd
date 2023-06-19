@@ -11,9 +11,13 @@ import (
 // POutput is a struct encapsulating all the data that can be attached
 // to any specific output of the PSBT.
 type POutput struct {
-	RedeemScript    []byte
-	WitnessScript   []byte
-	Bip32Derivation []*Bip32Derivation
+	RedeemScript           []byte
+	WitnessScript          []byte
+	Bip32Derivation        []*Bip32Derivation
+	TaprootInternalKey     []byte
+	TaprootTapTree         []byte
+	TaprootBip32Derivation []*TaprootBip32Derivation
+	Unknowns               []*Unknown
 }
 
 // NewPsbtOutput creates an instance of PsbtOutput; the three parameters
@@ -31,12 +35,12 @@ func NewPsbtOutput(redeemScript []byte, witnessScript []byte,
 // deserialize attempts to recode a new POutput from the passed io.Reader.
 func (po *POutput) deserialize(r io.Reader) error {
 	for {
-		keyint, keydata, err := getKey(r)
+		keyCode, keyData, err := getKey(r)
 		if err != nil {
 			return err
 		}
-		if keyint == -1 {
-			// Reached separator byte
+		if keyCode == -1 {
+			// Reached separator byte, this section is done.
 			break
 		}
 
@@ -47,14 +51,14 @@ func (po *POutput) deserialize(r io.Reader) error {
 			return err
 		}
 
-		switch OutputType(keyint) {
+		switch OutputType(keyCode) {
 
 		case RedeemScriptOutputType:
 			if po.RedeemScript != nil {
 				return ErrDuplicateKey
 			}
-			if keydata != nil {
-				return ErrInvalidKeydata
+			if keyData != nil {
+				return ErrInvalidKeyData
 			}
 			po.RedeemScript = value
 
@@ -62,38 +66,104 @@ func (po *POutput) deserialize(r io.Reader) error {
 			if po.WitnessScript != nil {
 				return ErrDuplicateKey
 			}
-			if keydata != nil {
-				return ErrInvalidKeydata
+			if keyData != nil {
+				return ErrInvalidKeyData
 			}
 			po.WitnessScript = value
 
 		case Bip32DerivationOutputType:
-			if !validatePubkey(keydata) {
-				return ErrInvalidKeydata
+			if !validatePubkey(keyData) {
+				return ErrInvalidKeyData
 			}
-			master, derivationPath, err := readBip32Derivation(value)
+			master, derivationPath, err := ReadBip32Derivation(
+				value,
+			)
 			if err != nil {
 				return err
 			}
 
-			// Duplicate keys are not allowed
+			// Duplicate keys are not allowed.
 			for _, x := range po.Bip32Derivation {
-				if bytes.Equal(x.PubKey, keydata) {
+				if bytes.Equal(x.PubKey, keyData) {
 					return ErrDuplicateKey
 				}
 			}
 
 			po.Bip32Derivation = append(po.Bip32Derivation,
 				&Bip32Derivation{
-					PubKey:               keydata,
+					PubKey:               keyData,
 					MasterKeyFingerprint: master,
 					Bip32Path:            derivationPath,
 				},
 			)
 
+		case TaprootInternalKeyOutputType:
+			if po.TaprootInternalKey != nil {
+				return ErrDuplicateKey
+			}
+			if keyData != nil {
+				return ErrInvalidKeyData
+			}
+
+			if !validateXOnlyPubkey(value) {
+				return ErrInvalidKeyData
+			}
+
+			po.TaprootInternalKey = value
+
+		case TaprootTapTreeType:
+			if po.TaprootTapTree != nil {
+				return ErrDuplicateKey
+			}
+			if keyData != nil {
+				return ErrInvalidKeyData
+			}
+
+			po.TaprootTapTree = value
+
+		case TaprootBip32DerivationOutputType:
+			if !validateXOnlyPubkey(keyData) {
+				return ErrInvalidKeyData
+			}
+
+			taprootDerivation, err := ReadTaprootBip32Derivation(
+				keyData, value,
+			)
+			if err != nil {
+				return err
+			}
+
+			// Duplicate keys are not allowed.
+			for _, x := range po.TaprootBip32Derivation {
+				if bytes.Equal(x.XOnlyPubKey, keyData) {
+					return ErrDuplicateKey
+				}
+			}
+
+			po.TaprootBip32Derivation = append(
+				po.TaprootBip32Derivation, taprootDerivation,
+			)
+
 		default:
-			// Unknown type is allowed for inputs but not outputs.
-			return ErrInvalidPsbtFormat
+			// A fall through case for any proprietary types.
+			keyCodeAndData := append(
+				[]byte{byte(keyCode)}, keyData...,
+			)
+			newUnknown := &Unknown{
+				Key:   keyCodeAndData,
+				Value: value,
+			}
+
+			// Duplicate key+keyData are not allowed.
+			for _, x := range po.Unknowns {
+				if bytes.Equal(x.Key, newUnknown.Key) &&
+					bytes.Equal(x.Value, newUnknown.Value) {
+
+					return ErrDuplicateKey
+				}
+			}
+
+			po.Unknowns = append(po.Unknowns, newUnknown)
 		}
 	}
 
@@ -130,6 +200,56 @@ func (po *POutput) serialize(w io.Writer) error {
 				kd.Bip32Path,
 			),
 		)
+		if err != nil {
+			return err
+		}
+	}
+
+	if po.TaprootInternalKey != nil {
+		err := serializeKVPairWithType(
+			w, uint8(TaprootInternalKeyOutputType), nil,
+			po.TaprootInternalKey,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	if po.TaprootTapTree != nil {
+		err := serializeKVPairWithType(
+			w, uint8(TaprootTapTreeType), nil,
+			po.TaprootTapTree,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	sort.Slice(po.TaprootBip32Derivation, func(i, j int) bool {
+		return po.TaprootBip32Derivation[i].SortBefore(
+			po.TaprootBip32Derivation[j],
+		)
+	})
+	for _, derivation := range po.TaprootBip32Derivation {
+		value, err := SerializeTaprootBip32Derivation(
+			derivation,
+		)
+		if err != nil {
+			return err
+		}
+		err = serializeKVPairWithType(
+			w, uint8(TaprootBip32DerivationOutputType),
+			derivation.XOnlyPubKey, value,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Unknown is a special case; we don't have a key type, only a key and
+	// a value field
+	for _, kv := range po.Unknowns {
+		err := serializeKVpair(w, kv.Key, kv.Value)
 		if err != nil {
 			return err
 		}

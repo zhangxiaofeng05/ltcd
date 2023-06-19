@@ -139,6 +139,11 @@ const (
 	// includes the deployment of BIPS 141, 142, 144, 145, 147 and 173.
 	DeploymentSegwit
 
+	// DeploymentTaproot defines the rule change deployment ID for the
+	// Taproot (+Schnorr) soft-fork package. The taproot package includes
+	// the deployment of BIPS 340, 341 and 342.
+	DeploymentTaproot
+
 	// NOTE: DefinedDeployments must always come last since it is used to
 	// determine how many defined deployments there currently are.
 
@@ -359,6 +364,17 @@ var MainNetParams = Params{
 				time.Unix(1510704000, 0), // November 15, 2017 UTC.
 			),
 		},
+		DeploymentTaproot: {
+			BitNumber: 2,
+			DeploymentStarter: NewMedianTimeDeploymentStarter(
+				time.Unix(1619222400, 0), // April 24th, 2021 UTC.
+			),
+			DeploymentEnder: NewMedianTimeDeploymentEnder(
+				time.Unix(1628640000, 0), // August 11th, 2021 UTC.
+			),
+			CustomActivationThreshold: 1815, // 90%
+			MinActivationHeight:       709_632,
+		},
 	},
 
 	// Mempool parameters
@@ -457,6 +473,16 @@ var RegressionNetParams = Params{
 			DeploymentEnder: NewMedianTimeDeploymentEnder(
 				time.Time{}, // Never expires.
 			),
+		},
+		DeploymentTaproot: {
+			BitNumber: 2,
+			DeploymentStarter: NewMedianTimeDeploymentStarter(
+				time.Time{}, // Always available for vote
+			),
+			DeploymentEnder: NewMedianTimeDeploymentEnder(
+				time.Time{}, // Never expires.
+			),
+			CustomActivationThreshold: 108, // Only needs 75% hash rate.
 		},
 	},
 
@@ -566,6 +592,16 @@ var TestNet4Params = Params{
 				time.Unix(1493596800, 0), // May 1, 2017 UTC.
 			),
 		},
+		DeploymentTaproot: {
+			BitNumber: 2,
+			DeploymentStarter: NewMedianTimeDeploymentStarter(
+				time.Unix(1619222400, 0), // April 24th, 2021 UTC.
+			),
+			DeploymentEnder: NewMedianTimeDeploymentEnder(
+				time.Unix(1628640000, 0), // August 11th, 2021 UTC
+			),
+			CustomActivationThreshold: 1512, // 75%
+		},
 	},
 
 	// Mempool parameters
@@ -668,6 +704,16 @@ var SimNetParams = Params{
 			DeploymentEnder: NewMedianTimeDeploymentEnder(
 				time.Time{}, // Never expires.
 			),
+		},
+		DeploymentTaproot: {
+			BitNumber: 2,
+			DeploymentStarter: NewMedianTimeDeploymentStarter(
+				time.Time{}, // Always available for vote
+			),
+			DeploymentEnder: NewMedianTimeDeploymentEnder(
+				time.Time{}, // Never expires.
+			),
+			CustomActivationThreshold: 75, // Only needs 75% hash rate.
 		},
 	},
 
@@ -779,6 +825,15 @@ func CustomSignetParams(challenge []byte, dnsSeeds []DNSSeed) Params {
 				),
 			},
 			DeploymentSegwit: {
+				BitNumber: 29,
+				DeploymentStarter: NewMedianTimeDeploymentStarter(
+					time.Time{}, // Always available for vote
+				),
+				DeploymentEnder: NewMedianTimeDeploymentEnder(
+					time.Time{}, // Never expires
+				),
+			},
+			DeploymentTaproot: {
 				BitNumber: 29,
 				DeploymentStarter: NewMedianTimeDeploymentStarter(
 					time.Time{}, // Always available for vote
@@ -918,8 +973,9 @@ func IsBech32SegwitPrefix(prefix string) bool {
 // ErrInvalidHDKeyID error will be returned.
 //
 // Reference:
-//   SLIP-0132 : Registered HD version bytes for BIP-0032
-//   https://github.com/satoshilabs/slips/blob/master/slip-0132.md
+//
+//	SLIP-0132 : Registered HD version bytes for BIP-0032
+//	https://github.com/satoshilabs/slips/blob/master/slip-0132.md
 func RegisterHDKeyID(hdPublicKeyID []byte, hdPrivateKeyID []byte) error {
 	if len(hdPublicKeyID) != 4 || len(hdPrivateKeyID) != 4 {
 		return ErrInvalidHDKeyID

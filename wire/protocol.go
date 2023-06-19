@@ -13,7 +13,7 @@ import (
 // XXX pedro: we will probably need to bump this.
 const (
 	// ProtocolVersion is the latest protocol version this package supports.
-	ProtocolVersion uint32 = 70015
+	ProtocolVersion uint32 = 70016
 
 	// MultipleAddressVersion is the protocol version which added multiple
 	// addresses per message (pver >= MultipleAddressVersion).
@@ -51,6 +51,13 @@ const (
 	// FeeFilterVersion is the protocol version which added a new
 	// feefilter message.
 	FeeFilterVersion uint32 = 70013
+
+	// AddrV2Version is the protocol version which added two new messages.
+	// sendaddrv2 is sent during the version-verack handshake and signals
+	// support for sending and receiving the addrv2 message. In the future,
+	// new messages that occur during the version-verack handshake will not
+	// come with a protocol version bump.
+	AddrV2Version uint32 = 70016
 )
 
 // ServiceFlag identifies services supported by a bitcoin peer.
@@ -72,32 +79,27 @@ const (
 	// and transactions including witness data (BIP0144).
 	SFNodeWitness
 
-	// SFNodeXthin is a flag used to indicate a peer supports xthin blocks.
-	SFNodeXthin
-
-	// SFNodeBit5 is a flag used to indicate a peer supports a service
-	// defined by bit 5.
-	SFNodeBit5
-
 	// SFNodeCF is a flag used to indicate a peer supports committed
 	// filters (CFs).
-	SFNodeCF
+	SFNodeCF ServiceFlag = 1 << 6
 
-	// SFNode2X is a flag used to indicate a peer is running the Segwit2X
-	// software.
-	SFNode2X
+	// SFNodeNetworkLimited is a flag used to indicate a peer supports serving
+	// the last 288 blocks.
+	SFNodeNetworkLimited ServiceFlag = 1 << 10
+
+	// SFNodeMWEB is a flag used to indicate a peer support MWEB blocks
+	SFNodeMWEB ServiceFlag = 1 << 24
 )
 
 // Map of service flags back to their constant names for pretty printing.
 var sfStrings = map[ServiceFlag]string{
-	SFNodeNetwork: "SFNodeNetwork",
-	SFNodeGetUTXO: "SFNodeGetUTXO",
-	SFNodeBloom:   "SFNodeBloom",
-	SFNodeWitness: "SFNodeWitness",
-	SFNodeXthin:   "SFNodeXthin",
-	SFNodeBit5:    "SFNodeBit5",
-	SFNodeCF:      "SFNodeCF",
-	SFNode2X:      "SFNode2X",
+	SFNodeNetwork:        "SFNodeNetwork",
+	SFNodeGetUTXO:        "SFNodeGetUTXO",
+	SFNodeBloom:          "SFNodeBloom",
+	SFNodeWitness:        "SFNodeWitness",
+	SFNodeCF:             "SFNodeCF",
+	SFNodeNetworkLimited: "SFNodeNetworkLimited",
+	SFNodeMWEB:           "SFNodeMWEB",
 }
 
 // orderedSFStrings is an ordered list of service flags from highest to
@@ -107,10 +109,9 @@ var orderedSFStrings = []ServiceFlag{
 	SFNodeGetUTXO,
 	SFNodeBloom,
 	SFNodeWitness,
-	SFNodeXthin,
-	SFNodeBit5,
 	SFNodeCF,
-	SFNode2X,
+	SFNodeNetworkLimited,
+	SFNodeMWEB,
 }
 
 // String returns the ServiceFlag in human-readable form.
@@ -141,7 +142,7 @@ func (f ServiceFlag) String() string {
 // BitcoinNet represents which bitcoin network a message belongs to.
 type BitcoinNet uint32
 
-// Constants used to indicate the message bitcoin network.  They can also be
+// Constants used to indicate the message litecoin network.  They can also be
 // used to seek to the next message when a stream's state is unknown, but
 // this package does not provide that functionality since it's generally a
 // better idea to simply disconnect clients that are misbehaving over TCP.
@@ -151,9 +152,6 @@ const (
 
 	// TestNet represents the regression test network.
 	TestNet BitcoinNet = 0xdab5bffa
-
-	// TestNet3 represents the test network (version 3).
-	TestNet3 BitcoinNet = 0x0709110b
 
 	// TestNet4 represents the test network (version 4).
 	TestNet4 BitcoinNet = 0xf1c8d2fd
@@ -167,7 +165,6 @@ const (
 var bnStrings = map[BitcoinNet]string{
 	MainNet:  "MainNet",
 	TestNet:  "TestNet",
-	TestNet3: "TestNet3",
 	TestNet4: "TestNet4",
 	SimNet:   "SimNet",
 }

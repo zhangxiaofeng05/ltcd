@@ -13,16 +13,22 @@ import (
 // PInput is a struct encapsulating all the data that can be attached to any
 // specific input of the PSBT.
 type PInput struct {
-	NonWitnessUtxo     *wire.MsgTx
-	WitnessUtxo        *wire.TxOut
-	PartialSigs        []*PartialSig
-	SighashType        txscript.SigHashType
-	RedeemScript       []byte
-	WitnessScript      []byte
-	Bip32Derivation    []*Bip32Derivation
-	FinalScriptSig     []byte
-	FinalScriptWitness []byte
-	Unknowns           []*Unknown
+	NonWitnessUtxo         *wire.MsgTx
+	WitnessUtxo            *wire.TxOut
+	PartialSigs            []*PartialSig
+	SighashType            txscript.SigHashType
+	RedeemScript           []byte
+	WitnessScript          []byte
+	Bip32Derivation        []*Bip32Derivation
+	FinalScriptSig         []byte
+	FinalScriptWitness     []byte
+	TaprootKeySpendSig     []byte
+	TaprootScriptSpendSig  []*TaprootScriptSpendSig
+	TaprootLeafScript      []*TaprootTapLeafScript
+	TaprootBip32Derivation []*TaprootBip32Derivation
+	TaprootInternalKey     []byte
+	TaprootMerkleRoot      []byte
+	Unknowns               []*Unknown
 }
 
 // NewPsbtInput creates an instance of PsbtInput given either a nonWitnessUtxo
@@ -31,9 +37,7 @@ type PInput struct {
 // NOTE: Only one of the two arguments should be specified, with the other
 // being `nil`; otherwise the created PsbtInput object will fail IsSane()
 // checks and will not be usable.
-func NewPsbtInput(nonWitnessUtxo *wire.MsgTx,
-	witnessUtxo *wire.TxOut) *PInput {
-
+func NewPsbtInput(nonWitnessUtxo *wire.MsgTx, witnessUtxo *wire.TxOut) *PInput {
 	return &PInput{
 		NonWitnessUtxo:     nonWitnessUtxo,
 		WitnessUtxo:        witnessUtxo,
@@ -51,7 +55,6 @@ func NewPsbtInput(nonWitnessUtxo *wire.MsgTx,
 // IsSane returns true only if there are no conflicting values in the Psbt
 // PInput. For segwit v0 no checks are currently implemented.
 func (pi *PInput) IsSane() bool {
-
 	// TODO(guggero): Implement sanity checks for segwit v1. For segwit v0
 	// it is unsafe to only rely on the witness UTXO so we don't check that
 	// only one is set anymore.
@@ -63,12 +66,12 @@ func (pi *PInput) IsSane() bool {
 // deserialize attempts to deserialize a new PInput from the passed io.Reader.
 func (pi *PInput) deserialize(r io.Reader) error {
 	for {
-		keyint, keydata, err := getKey(r)
+		keyCode, keyData, err := getKey(r)
 		if err != nil {
 			return err
 		}
-		if keyint == -1 {
-			// Reached separator byte
+		if keyCode == -1 {
+			// Reached separator byte, this section is done.
 			break
 		}
 		value, err := wire.ReadVarBytes(
@@ -78,14 +81,14 @@ func (pi *PInput) deserialize(r io.Reader) error {
 			return err
 		}
 
-		switch InputType(keyint) {
+		switch InputType(keyCode) {
 
 		case NonWitnessUtxoType:
 			if pi.NonWitnessUtxo != nil {
 				return ErrDuplicateKey
 			}
-			if keydata != nil {
-				return ErrInvalidKeydata
+			if keyData != nil {
+				return ErrInvalidKeyData
 			}
 			tx := wire.NewMsgTx(2)
 
@@ -99,8 +102,8 @@ func (pi *PInput) deserialize(r io.Reader) error {
 			if pi.WitnessUtxo != nil {
 				return ErrDuplicateKey
 			}
-			if keydata != nil {
-				return ErrInvalidKeydata
+			if keyData != nil {
+				return ErrInvalidKeyData
 			}
 			txout, err := readTxOut(value)
 			if err != nil {
@@ -110,7 +113,7 @@ func (pi *PInput) deserialize(r io.Reader) error {
 
 		case PartialSigType:
 			newPartialSig := PartialSig{
-				PubKey:    keydata,
+				PubKey:    keyData,
 				Signature: value,
 			}
 
@@ -118,7 +121,7 @@ func (pi *PInput) deserialize(r io.Reader) error {
 				return ErrInvalidPsbtFormat
 			}
 
-			// Duplicate keys are not allowed
+			// Duplicate keys are not allowed.
 			for _, x := range pi.PartialSigs {
 				if bytes.Equal(x.PubKey, newPartialSig.PubKey) {
 					return ErrDuplicateKey
@@ -131,27 +134,27 @@ func (pi *PInput) deserialize(r io.Reader) error {
 			if pi.SighashType != 0 {
 				return ErrDuplicateKey
 			}
-			if keydata != nil {
-				return ErrInvalidKeydata
+			if keyData != nil {
+				return ErrInvalidKeyData
 			}
 
-			// Bounds check on value here since the sighash type must be a
-			// 32-bit unsigned integer.
+			// Bounds check on value here since the sighash type
+			// must be a 32-bit unsigned integer.
 			if len(value) != 4 {
-				return ErrInvalidKeydata
+				return ErrInvalidKeyData
 			}
 
-			shtype := txscript.SigHashType(
+			sighashType := txscript.SigHashType(
 				binary.LittleEndian.Uint32(value),
 			)
-			pi.SighashType = shtype
+			pi.SighashType = sighashType
 
 		case RedeemScriptInputType:
 			if pi.RedeemScript != nil {
 				return ErrDuplicateKey
 			}
-			if keydata != nil {
-				return ErrInvalidKeydata
+			if keyData != nil {
+				return ErrInvalidKeyData
 			}
 			pi.RedeemScript = value
 
@@ -159,23 +162,25 @@ func (pi *PInput) deserialize(r io.Reader) error {
 			if pi.WitnessScript != nil {
 				return ErrDuplicateKey
 			}
-			if keydata != nil {
-				return ErrInvalidKeydata
+			if keyData != nil {
+				return ErrInvalidKeyData
 			}
 			pi.WitnessScript = value
 
 		case Bip32DerivationInputType:
-			if !validatePubkey(keydata) {
+			if !validatePubkey(keyData) {
 				return ErrInvalidPsbtFormat
 			}
-			master, derivationPath, err := readBip32Derivation(value)
+			master, derivationPath, err := ReadBip32Derivation(
+				value,
+			)
 			if err != nil {
 				return err
 			}
 
 			// Duplicate keys are not allowed
 			for _, x := range pi.Bip32Derivation {
-				if bytes.Equal(x.PubKey, keydata) {
+				if bytes.Equal(x.PubKey, keyData) {
 					return ErrDuplicateKey
 				}
 			}
@@ -183,7 +188,7 @@ func (pi *PInput) deserialize(r io.Reader) error {
 			pi.Bip32Derivation = append(
 				pi.Bip32Derivation,
 				&Bip32Derivation{
-					PubKey:               keydata,
+					PubKey:               keyData,
 					MasterKeyFingerprint: master,
 					Bip32Path:            derivationPath,
 				},
@@ -193,8 +198,8 @@ func (pi *PInput) deserialize(r io.Reader) error {
 			if pi.FinalScriptSig != nil {
 				return ErrDuplicateKey
 			}
-			if keydata != nil {
-				return ErrInvalidKeydata
+			if keyData != nil {
+				return ErrInvalidKeyData
 			}
 
 			pi.FinalScriptSig = value
@@ -203,25 +208,176 @@ func (pi *PInput) deserialize(r io.Reader) error {
 			if pi.FinalScriptWitness != nil {
 				return ErrDuplicateKey
 			}
-			if keydata != nil {
-				return ErrInvalidKeydata
+			if keyData != nil {
+				return ErrInvalidKeyData
 			}
 
 			pi.FinalScriptWitness = value
 
+		case TaprootKeySpendSignatureType:
+			if pi.TaprootKeySpendSig != nil {
+				return ErrDuplicateKey
+			}
+			if keyData != nil {
+				return ErrInvalidKeyData
+			}
+
+			// The signature can either be 64 or 65 bytes.
+			switch {
+			case len(value) == schnorrSigMinLength:
+				if !validateSchnorrSignature(value) {
+					return ErrInvalidKeyData
+				}
+
+			case len(value) == schnorrSigMaxLength:
+				if !validateSchnorrSignature(
+					value[0:schnorrSigMinLength],
+				) {
+					return ErrInvalidKeyData
+				}
+
+			default:
+				return ErrInvalidKeyData
+			}
+
+			pi.TaprootKeySpendSig = value
+
+		case TaprootScriptSpendSignatureType:
+			// The key data for the script spend signature is:
+			//   <xonlypubkey> <leafhash>
+			if len(keyData) != 32*2 {
+				return ErrInvalidKeyData
+			}
+
+			newPartialSig := TaprootScriptSpendSig{
+				XOnlyPubKey: keyData[:32],
+				LeafHash:    keyData[32:],
+			}
+
+			// The signature can either be 64 or 65 bytes.
+			switch {
+			case len(value) == schnorrSigMinLength:
+				newPartialSig.Signature = value
+				newPartialSig.SigHash = txscript.SigHashDefault
+
+			case len(value) == schnorrSigMaxLength:
+				newPartialSig.Signature = value[0:schnorrSigMinLength]
+				newPartialSig.SigHash = txscript.SigHashType(
+					value[schnorrSigMinLength],
+				)
+
+			default:
+				return ErrInvalidKeyData
+			}
+
+			if !newPartialSig.checkValid() {
+				return ErrInvalidKeyData
+			}
+
+			// Duplicate keys are not allowed.
+			for _, x := range pi.TaprootScriptSpendSig {
+				if x.EqualKey(&newPartialSig) {
+					return ErrDuplicateKey
+				}
+			}
+
+			pi.TaprootScriptSpendSig = append(
+				pi.TaprootScriptSpendSig, &newPartialSig,
+			)
+
+		case TaprootLeafScriptType:
+			if len(value) < 1 {
+				return ErrInvalidKeyData
+			}
+
+			newLeafScript := TaprootTapLeafScript{
+				ControlBlock: keyData,
+				Script:       value[:len(value)-1],
+				LeafVersion: txscript.TapscriptLeafVersion(
+					value[len(value)-1],
+				),
+			}
+
+			if !newLeafScript.checkValid() {
+				return ErrInvalidKeyData
+			}
+
+			// Duplicate keys are not allowed.
+			for _, x := range pi.TaprootLeafScript {
+				if bytes.Equal(
+					x.ControlBlock,
+					newLeafScript.ControlBlock,
+				) {
+					return ErrDuplicateKey
+				}
+			}
+
+			pi.TaprootLeafScript = append(
+				pi.TaprootLeafScript, &newLeafScript,
+			)
+
+		case TaprootBip32DerivationInputType:
+			if !validateXOnlyPubkey(keyData) {
+				return ErrInvalidKeyData
+			}
+
+			taprootDerivation, err := ReadTaprootBip32Derivation(
+				keyData, value,
+			)
+			if err != nil {
+				return err
+			}
+
+			// Duplicate keys are not allowed.
+			for _, x := range pi.TaprootBip32Derivation {
+				if bytes.Equal(x.XOnlyPubKey, keyData) {
+					return ErrDuplicateKey
+				}
+			}
+
+			pi.TaprootBip32Derivation = append(
+				pi.TaprootBip32Derivation, taprootDerivation,
+			)
+
+		case TaprootInternalKeyInputType:
+			if pi.TaprootInternalKey != nil {
+				return ErrDuplicateKey
+			}
+			if keyData != nil {
+				return ErrInvalidKeyData
+			}
+
+			if !validateXOnlyPubkey(value) {
+				return ErrInvalidKeyData
+			}
+
+			pi.TaprootInternalKey = value
+
+		case TaprootMerkleRootType:
+			if pi.TaprootMerkleRoot != nil {
+				return ErrDuplicateKey
+			}
+			if keyData != nil {
+				return ErrInvalidKeyData
+			}
+
+			pi.TaprootMerkleRoot = value
+
 		default:
 			// A fall through case for any proprietary types.
-			keyintanddata := []byte{byte(keyint)}
-			keyintanddata = append(keyintanddata, keydata...)
+			keyCodeAndData := append(
+				[]byte{byte(keyCode)}, keyData...,
+			)
 			newUnknown := &Unknown{
-				Key:   keyintanddata,
+				Key:   keyCodeAndData,
 				Value: value,
 			}
 
-			// Duplicate key+keydata are not allowed
+			// Duplicate key+keyData are not allowed.
 			for _, x := range pi.Unknowns {
 				if bytes.Equal(x.Key, newUnknown.Key) &&
 					bytes.Equal(x.Value, newUnknown.Value) {
+
 					return ErrDuplicateKey
 				}
 			}
@@ -235,7 +391,6 @@ func (pi *PInput) deserialize(r io.Reader) error {
 
 // serialize attempts to serialize the target PInput into the passed io.Writer.
 func (pi *PInput) serialize(w io.Writer) error {
-
 	if !pi.IsSane() {
 		return ErrInvalidPsbtFormat
 	}
@@ -328,6 +483,95 @@ func (pi *PInput) serialize(w io.Writer) error {
 				return err
 			}
 		}
+
+		if pi.TaprootKeySpendSig != nil {
+			err := serializeKVPairWithType(
+				w, uint8(TaprootKeySpendSignatureType), nil,
+				pi.TaprootKeySpendSig,
+			)
+			if err != nil {
+				return err
+			}
+		}
+
+		sort.Slice(pi.TaprootScriptSpendSig, func(i, j int) bool {
+			return pi.TaprootScriptSpendSig[i].SortBefore(
+				pi.TaprootScriptSpendSig[j],
+			)
+		})
+		for _, scriptSpend := range pi.TaprootScriptSpendSig {
+			keyData := append([]byte{}, scriptSpend.XOnlyPubKey...)
+			keyData = append(keyData, scriptSpend.LeafHash...)
+			value := append([]byte{}, scriptSpend.Signature...)
+			if scriptSpend.SigHash != txscript.SigHashDefault {
+				value = append(value, byte(scriptSpend.SigHash))
+			}
+			err := serializeKVPairWithType(
+				w, uint8(TaprootScriptSpendSignatureType),
+				keyData, value,
+			)
+			if err != nil {
+				return err
+			}
+		}
+
+		sort.Slice(pi.TaprootLeafScript, func(i, j int) bool {
+			return pi.TaprootLeafScript[i].SortBefore(
+				pi.TaprootLeafScript[j],
+			)
+		})
+		for _, leafScript := range pi.TaprootLeafScript {
+			value := append([]byte{}, leafScript.Script...)
+			value = append(value, byte(leafScript.LeafVersion))
+			err := serializeKVPairWithType(
+				w, uint8(TaprootLeafScriptType),
+				leafScript.ControlBlock, value,
+			)
+			if err != nil {
+				return err
+			}
+		}
+
+		sort.Slice(pi.TaprootBip32Derivation, func(i, j int) bool {
+			return pi.TaprootBip32Derivation[i].SortBefore(
+				pi.TaprootBip32Derivation[j],
+			)
+		})
+		for _, derivation := range pi.TaprootBip32Derivation {
+			value, err := SerializeTaprootBip32Derivation(
+				derivation,
+			)
+			if err != nil {
+				return err
+			}
+			err = serializeKVPairWithType(
+				w, uint8(TaprootBip32DerivationInputType),
+				derivation.XOnlyPubKey, value,
+			)
+			if err != nil {
+				return err
+			}
+		}
+
+		if pi.TaprootInternalKey != nil {
+			err := serializeKVPairWithType(
+				w, uint8(TaprootInternalKeyInputType), nil,
+				pi.TaprootInternalKey,
+			)
+			if err != nil {
+				return err
+			}
+		}
+
+		if pi.TaprootMerkleRoot != nil {
+			err := serializeKVPairWithType(
+				w, uint8(TaprootMerkleRootType), nil,
+				pi.TaprootMerkleRoot,
+			)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	if pi.FinalScriptSig != nil {
@@ -349,7 +593,7 @@ func (pi *PInput) serialize(w io.Writer) error {
 	}
 
 	// Unknown is a special case; we don't have a key type, only a key and
-	// a value field
+	// a value field.
 	for _, kv := range pi.Unknowns {
 		err := serializeKVpair(w, kv.Key, kv.Value)
 		if err != nil {

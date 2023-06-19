@@ -17,11 +17,8 @@ func TestServiceFlagStringer(t *testing.T) {
 		{SFNodeGetUTXO, "SFNodeGetUTXO"},
 		{SFNodeBloom, "SFNodeBloom"},
 		{SFNodeWitness, "SFNodeWitness"},
-		{SFNodeXthin, "SFNodeXthin"},
-		{SFNodeBit5, "SFNodeBit5"},
 		{SFNodeCF, "SFNodeCF"},
-		{SFNode2X, "SFNode2X"},
-		{0xffffffff, "SFNodeNetwork|SFNodeGetUTXO|SFNodeBloom|SFNodeWitness|SFNodeXthin|SFNodeBit5|SFNodeCF|SFNode2X|0xffffff00"},
+		{0xffffffff, "SFNodeNetwork|SFNodeGetUTXO|SFNodeBloom|SFNodeWitness|SFNodeCF|SFNodeNetworkLimited|SFNodeMWEB|0xfefffbb0"},
 	}
 
 	t.Logf("Running %d tests", len(tests))
@@ -44,7 +41,6 @@ func TestBitcoinNetStringer(t *testing.T) {
 		{MainNet, "MainNet"},
 		{TestNet, "TestNet"},
 		{TestNet4, "TestNet4"},
-		{SimNet, "SimNet"},
 		{0xffffffff, "Unknown BitcoinNet (4294967295)"},
 	}
 

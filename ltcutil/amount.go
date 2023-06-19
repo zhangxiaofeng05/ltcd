@@ -58,10 +58,7 @@ type Amount int64
 // This is performed by adding or subtracting 0.5 depending on the sign, and
 // relying on integer truncation to round the value to the nearest Amount.
 func round(f float64) Amount {
-	if f < 0 {
-		return Amount(f - 0.5)
-	}
-	return Amount(f + 0.5)
+	return Amount(math.Round(f))
 }
 
 // NewAmount creates an Amount from a floating point value representing

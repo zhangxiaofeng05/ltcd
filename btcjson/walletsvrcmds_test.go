@@ -379,24 +379,40 @@ func TestWalletSvrCmds(t *testing.T) {
 				return btcjson.NewCmd("getnewaddress")
 			},
 			staticCmd: func() interface{} {
-				return btcjson.NewGetNewAddressCmd(nil)
+				return btcjson.NewGetNewAddressCmd(nil, nil)
 			},
 			marshalled: `{"jsonrpc":"1.0","method":"getnewaddress","params":[],"id":1}`,
 			unmarshalled: &btcjson.GetNewAddressCmd{
-				Account: nil,
+				Account:     nil,
+				AddressType: nil,
 			},
 		},
 		{
-			name: "getnewaddress optional",
+			name: "getnewaddress optional acct",
 			newCmd: func() (interface{}, error) {
 				return btcjson.NewCmd("getnewaddress", "acct")
 			},
 			staticCmd: func() interface{} {
-				return btcjson.NewGetNewAddressCmd(btcjson.String("acct"))
+				return btcjson.NewGetNewAddressCmd(btcjson.String("acct"), nil)
 			},
 			marshalled: `{"jsonrpc":"1.0","method":"getnewaddress","params":["acct"],"id":1}`,
 			unmarshalled: &btcjson.GetNewAddressCmd{
-				Account: btcjson.String("acct"),
+				Account:     btcjson.String("acct"),
+				AddressType: nil,
+			},
+		},
+		{
+			name: "getnewaddress optional acct and type",
+			newCmd: func() (interface{}, error) {
+				return btcjson.NewCmd("getnewaddress", "acct", "legacy")
+			},
+			staticCmd: func() interface{} {
+				return btcjson.NewGetNewAddressCmd(btcjson.String("acct"), btcjson.String("legacy"))
+			},
+			marshalled: `{"jsonrpc":"1.0","method":"getnewaddress","params":["acct","legacy"],"id":1}`,
+			unmarshalled: &btcjson.GetNewAddressCmd{
+				Account:     btcjson.String("acct"),
+				AddressType: btcjson.String("legacy"),
 			},
 		},
 		{
@@ -405,24 +421,40 @@ func TestWalletSvrCmds(t *testing.T) {
 				return btcjson.NewCmd("getrawchangeaddress")
 			},
 			staticCmd: func() interface{} {
-				return btcjson.NewGetRawChangeAddressCmd(nil)
+				return btcjson.NewGetRawChangeAddressCmd(nil, nil)
 			},
 			marshalled: `{"jsonrpc":"1.0","method":"getrawchangeaddress","params":[],"id":1}`,
 			unmarshalled: &btcjson.GetRawChangeAddressCmd{
-				Account: nil,
+				Account:     nil,
+				AddressType: nil,
 			},
 		},
 		{
-			name: "getrawchangeaddress optional",
+			name: "getrawchangeaddress optional acct",
 			newCmd: func() (interface{}, error) {
 				return btcjson.NewCmd("getrawchangeaddress", "acct")
 			},
 			staticCmd: func() interface{} {
-				return btcjson.NewGetRawChangeAddressCmd(btcjson.String("acct"))
+				return btcjson.NewGetRawChangeAddressCmd(btcjson.String("acct"), nil)
 			},
 			marshalled: `{"jsonrpc":"1.0","method":"getrawchangeaddress","params":["acct"],"id":1}`,
 			unmarshalled: &btcjson.GetRawChangeAddressCmd{
-				Account: btcjson.String("acct"),
+				Account:     btcjson.String("acct"),
+				AddressType: nil,
+			},
+		},
+		{
+			name: "getrawchangeaddress optional acct and type",
+			newCmd: func() (interface{}, error) {
+				return btcjson.NewCmd("getrawchangeaddress", "acct", "legacy")
+			},
+			staticCmd: func() interface{} {
+				return btcjson.NewGetRawChangeAddressCmd(btcjson.String("acct"), btcjson.String("legacy"))
+			},
+			marshalled: `{"jsonrpc":"1.0","method":"getrawchangeaddress","params":["acct","legacy"],"id":1}`,
+			unmarshalled: &btcjson.GetRawChangeAddressCmd{
+				Account:     btcjson.String("acct"),
+				AddressType: btcjson.String("legacy"),
 			},
 		},
 		{

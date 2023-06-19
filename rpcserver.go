@@ -1259,6 +1259,9 @@ func handleGetBlockChainInfo(s *rpcServer, cmd interface{}, closeChan <-chan str
 		case chaincfg.DeploymentSegwit:
 			forkName = "segwit"
 
+		case chaincfg.DeploymentTaproot:
+			forkName = "taproot"
+
 		default:
 			return nil, &btcjson.RPCError{
 				Code: btcjson.ErrRPCInternal.Code,
@@ -2518,7 +2521,7 @@ func handleGetNodeAddresses(s *rpcServer, cmd interface{}, closeChan <-chan stru
 		address := &btcjson.GetNodeAddressesResult{
 			Time:     node.Timestamp.Unix(),
 			Services: uint64(node.Services),
-			Address:  node.IP.String(),
+			Address:  node.Addr.String(),
 			Port:     node.Port,
 		}
 		addresses = append(addresses, address)
@@ -3616,7 +3619,7 @@ func handleValidateAddress(s *rpcServer, cmd interface{}, closeChan <-chan struc
 		result.WitnessProgram = btcjson.String(hex.EncodeToString(addr.WitnessProgram()))
 
 	default:
-		// Handle the case when a new Address is supported by btcutil, but none
+		// Handle the case when a new Address is supported by ltcutil, but none
 		// of the cases were matched in the switch block. The current behaviour
 		// is to do nothing, and only populate the Address and IsValid fields.
 	}
@@ -4524,7 +4527,7 @@ type rpcserverConnManager interface {
 
 	// NodeAddresses returns an array consisting node addresses which can
 	// potentially be used to find new nodes in the network.
-	NodeAddresses() []*wire.NetAddress
+	NodeAddresses() []*wire.NetAddressV2
 }
 
 // rpcserverSyncManager represents a sync manager for use with the RPC server.

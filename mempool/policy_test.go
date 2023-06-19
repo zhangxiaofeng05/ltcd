@@ -270,7 +270,7 @@ func TestDust(t *testing.T) {
 	}
 }
 
-// TestCheckTransactionStandard tests the checkTransactionStandard API.
+// TestCheckTransactionStandard tests the CheckTransactionStandard API.
 func TestCheckTransactionStandard(t *testing.T) {
 	// Create some dummy, but otherwise standard, data for transactions.
 	prevOutHash, err := chainhash.NewHashFromStr("01")
@@ -462,7 +462,7 @@ func TestCheckTransactionStandard(t *testing.T) {
 	pastMedianTime := time.Now()
 	for _, test := range tests {
 		// Ensure standardness is as expected.
-		err := checkTransactionStandard(ltcutil.NewTx(&test.tx),
+		err := CheckTransactionStandard(ltcutil.NewTx(&test.tx),
 			test.height, pastMedianTime, DefaultMinRelayTxFee, 1)
 		if err == nil && test.isStandard {
 			// Test passes since function returned standard for a
@@ -470,12 +470,12 @@ func TestCheckTransactionStandard(t *testing.T) {
 			continue
 		}
 		if err == nil && !test.isStandard {
-			t.Errorf("checkTransactionStandard (%s): standard when "+
+			t.Errorf("CheckTransactionStandard (%s): standard when "+
 				"it should not be", test.name)
 			continue
 		}
 		if err != nil && test.isStandard {
-			t.Errorf("checkTransactionStandard (%s): nonstandard "+
+			t.Errorf("CheckTransactionStandard (%s): nonstandard "+
 				"when it should not be: %v", test.name, err)
 			continue
 		}
@@ -483,20 +483,20 @@ func TestCheckTransactionStandard(t *testing.T) {
 		// Ensure error type is a TxRuleError inside of a RuleError.
 		rerr, ok := err.(RuleError)
 		if !ok {
-			t.Errorf("checkTransactionStandard (%s): unexpected "+
+			t.Errorf("CheckTransactionStandard (%s): unexpected "+
 				"error type - got %T", test.name, err)
 			continue
 		}
 		txrerr, ok := rerr.Err.(TxRuleError)
 		if !ok {
-			t.Errorf("checkTransactionStandard (%s): unexpected "+
+			t.Errorf("CheckTransactionStandard (%s): unexpected "+
 				"error type - got %T", test.name, rerr.Err)
 			continue
 		}
 
 		// Ensure the reject code is the expected one.
 		if txrerr.RejectCode != test.code {
-			t.Errorf("checkTransactionStandard (%s): unexpected "+
+			t.Errorf("CheckTransactionStandard (%s): unexpected "+
 				"error code - got %v, want %v", test.name,
 				txrerr.RejectCode, test.code)
 			continue
