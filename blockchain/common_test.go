@@ -57,8 +57,8 @@ func isSupportedDbType(dbType string) bool {
 	return false
 }
 
-// loadBlocks reads files containing bitcoin block data (gzipped but otherwise
-// in the format bitcoind writes) from disk and returns them as an array of
+// loadBlocks reads files containing litecoin block data (gzipped but otherwise
+// in the format litecoind writes) from disk and returns them as an array of
 // ltcutil.Block.  This is largely borrowed from the test code in ltcdb.
 func loadBlocks(filename string) (blocks []*ltcutil.Block, err error) {
 	filename = filepath.Join("testdata/", filename)
