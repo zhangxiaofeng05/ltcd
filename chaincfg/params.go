@@ -402,7 +402,7 @@ var MainNetParams = Params{
 
 // RegressionNetParams defines the network parameters for the regression test
 // Litecoin network.  Not to be confused with the test Litecoin network (version
-// 3), this network is sometimes simply called "testnet".
+// 4), this network is sometimes simply called "testnet".
 var RegressionNetParams = Params{
 	Name:        "regtest",
 	Net:         wire.TestNet,
@@ -419,9 +419,9 @@ var RegressionNetParams = Params{
 	BIP0065Height:            1351,      // Used by regression tests
 	BIP0066Height:            1251,      // Used by regression tests
 	SubsidyReductionInterval: 150,
-	TargetTimespan:           time.Hour * 24 * 14, // 14 days
-	TargetTimePerBlock:       time.Minute * 10,    // 10 minutes
-	RetargetAdjustmentFactor: 4,                   // 25% less, 400% more
+	TargetTimespan:           (time.Hour * 24 * 3) + (time.Hour * 12), // 3.5 days
+	TargetTimePerBlock:       (time.Minute * 2) + (time.Second * 30),  // 2.5 minutes
+	RetargetAdjustmentFactor: 4,                                       // 25% less, 400% more
 	ReduceMinDifficulty:      true,
 	MinDiffReductionTime:     time.Minute * 20, // TargetTimePerBlock * 2
 	GenerateSupported:        true,
@@ -650,9 +650,9 @@ var SimNetParams = Params{
 	BIP0066Height:            0, // Always active on simnet
 	CoinbaseMaturity:         100,
 	SubsidyReductionInterval: 210000,
-	TargetTimespan:           time.Hour * 24 * 14, // 14 days
-	TargetTimePerBlock:       time.Minute * 10,    // 10 minutes
-	RetargetAdjustmentFactor: 4,                   // 25% less, 400% more
+	TargetTimespan:           (time.Hour * 24 * 3) + (time.Hour * 12), // 3.5 days
+	TargetTimePerBlock:       (time.Minute * 2) + (time.Second * 30),  // 2.5 minutes
+	RetargetAdjustmentFactor: 4,                                       // 25% less, 400% more
 	ReduceMinDifficulty:      true,
 	MinDiffReductionTime:     time.Minute * 20, // TargetTimePerBlock * 2
 	GenerateSupported:        true,
@@ -772,15 +772,15 @@ func CustomSignetParams(challenge []byte, dnsSeeds []DNSSeed) Params {
 		GenesisBlock:             &sigNetGenesisBlock,
 		GenesisHash:              &sigNetGenesisHash,
 		PowLimit:                 sigNetPowLimit,
-		PowLimitBits:             0x1e0377ae,
+		PowLimitBits:             0x207fffff,
 		BIP0034Height:            1,
 		BIP0065Height:            1,
 		BIP0066Height:            1,
 		CoinbaseMaturity:         100,
 		SubsidyReductionInterval: 210000,
-		TargetTimespan:           time.Hour * 24 * 14, // 14 days
-		TargetTimePerBlock:       time.Minute * 10,    // 10 minutes
-		RetargetAdjustmentFactor: 4,                   // 25% less, 400% more
+		TargetTimespan:           (time.Hour * 24 * 3) + (time.Hour * 12), // 3.5 days
+		TargetTimePerBlock:       (time.Minute * 2) + (time.Second * 30),  // 2.5 minutes
+		RetargetAdjustmentFactor: 4,                                       // 25% less, 400% more
 		ReduceMinDifficulty:      false,
 		MinDiffReductionTime:     time.Minute * 20, // TargetTimePerBlock * 2
 		GenerateSupported:        false,
@@ -849,7 +849,7 @@ func CustomSignetParams(challenge []byte, dnsSeeds []DNSSeed) Params {
 
 		// Human-readable part for Bech32 encoded segwit addresses, as defined in
 		// BIP 173.
-		Bech32HRPSegwit: "tb", // always tb for test net
+		Bech32HRPSegwit: "tltc", // always tltc for test net
 
 		// Address encoding magics
 		PubKeyHashAddrID:        0x6f, // starts with m or n

@@ -53,7 +53,7 @@ var (
 		Header: wire.BlockHeader{
 			Version:    1,
 			PrevBlock:  *newHashFromStr("0000000000000000000000000000000000000000000000000000000000000000"),
-			MerkleRoot: *newHashFromStr("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"),
+			MerkleRoot: *newHashFromStr("97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd4ced9"),
 			Timestamp:  time.Unix(1296688602, 0), // 2011-02-02 23:16:42 +0000 UTC
 			Bits:       0x207fffff,               // 545259519 [7fffff0000000000000000000000000000000000000000000000000000000000]
 			Nonce:      2,
@@ -65,20 +65,12 @@ var (
 					Hash:  chainhash.Hash{},
 					Index: 0xffffffff,
 				},
-				SignatureScript: fromHex("04ffff001d010445" +
-					"5468652054696d65732030332f4a616e2f" +
-					"32303039204368616e63656c6c6f72206f" +
-					"6e206272696e6b206f66207365636f6e64" +
-					"206261696c6f757420666f72206261686b73"),
-				Sequence: 0xffffffff,
+				SignatureScript: fromHex("04ffff001d0104404e592054696d65732030352f4f63742f32303131205374657665204a6f62732c204170706c65e280997320566973696f6e6172792c2044696573206174203536"),
+				Sequence:        0xffffffff,
 			}},
 			TxOut: []*wire.TxOut{{
-				Value: 0,
-				PkScript: fromHex("4104678afdb0fe5548271967f1" +
-					"a67130b7105cd6a828e03909a67962e0ea1f" +
-					"61deb649f6bc3f4cef38c4f35504e51ec138" +
-					"c4f35504e51ec112de5c384df7ba0b8d578a" +
-					"4c702b6bf11d5fac"),
+				Value:    0,
+				PkScript: fromHex("41418471fa689ad502369c80f3a49c8f13f8d45b8c857fbcbc8bc4a8e4d3eb4b10f4d4604fa08dce601aaff47216fe1b5185b4acf21b179c45070ac7b3a9ac"),
 			}},
 			LockTime: 0,
 		}},
@@ -95,11 +87,11 @@ var (
 var regressionNetParams = &chaincfg.Params{
 	Name:        "regtest",
 	Net:         wire.TestNet,
-	DefaultPort: "18444",
+	DefaultPort: "19444",
 
 	// Chain parameters
 	GenesisBlock:             &regTestGenesisBlock,
-	GenesisHash:              newHashFromStr("5bec7567af40504e0994db3b573c186fffcc4edefe096ff2e58d00523bd7e8a6"),
+	GenesisHash:              newHashFromStr("530827f38f93b43ed12af0b3ad25a288dc02ed74d6d7857862df51fc56c416f9"),
 	PowLimit:                 regressionPowLimit,
 	PowLimitBits:             0x207fffff,
 	CoinbaseMaturity:         100,
@@ -107,9 +99,9 @@ var regressionNetParams = &chaincfg.Params{
 	BIP0065Height:            1351,      // Used by regression tests
 	BIP0066Height:            1251,      // Used by regression tests
 	SubsidyReductionInterval: 150,
-	TargetTimespan:           time.Hour * 24 * 14, // 14 days
-	TargetTimePerBlock:       time.Minute * 10,    // 10 minutes
-	RetargetAdjustmentFactor: 4,                   // 25% less, 400% more
+	TargetTimespan:           (time.Hour * 24 * 3) + (time.Hour * 12), // 3.5 days
+	TargetTimePerBlock:       (time.Minute * 2) + (time.Second * 30),  // 2.5 minutes
+	RetargetAdjustmentFactor: 4,                                       // 25% less, 400% more
 	ReduceMinDifficulty:      true,
 	MinDiffReductionTime:     time.Minute * 20, // TargetTimePerBlock * 2
 	GenerateSupported:        true,
