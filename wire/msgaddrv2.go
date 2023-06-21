@@ -9,7 +9,7 @@ import (
 // in a single addrv2 message (MsgAddrV2).
 const MaxV2AddrPerMsg = 1000
 
-// MsgAddrV2 implements the Message interface and represents a bitcoin addrv2
+// MsgAddrV2 implements the Message interface and represents a litecoin addrv2
 // message that can support longer-length addresses like torv3, cjdns, and i2p.
 // It is used to gossip addresses on the network. Each message is limited to
 // MaxV2AddrPerMsg addresses. This is the same limit as MsgAddr.
@@ -17,7 +17,7 @@ type MsgAddrV2 struct {
 	AddrList []*NetAddressV2
 }
 
-// BtcDecode decodes r using the bitcoin protocol into a MsgAddrV2.
+// BtcDecode decodes r using the litecoin protocol into a MsgAddrV2.
 func (m *MsgAddrV2) BtcDecode(r io.Reader, pver uint32,
 	enc MessageEncoding) error {
 
@@ -93,7 +93,7 @@ func (m *MsgAddrV2) MaxPayloadLength(pver uint32) uint32 {
 	return 3 + (MaxV2AddrPerMsg * maxNetAddressV2Payload())
 }
 
-// NewMsgAddrV2 returns a new bitcoin addrv2 message that conforms to the
+// NewMsgAddrV2 returns a new litecoin addrv2 message that conforms to the
 // Message interface.
 func NewMsgAddrV2() *MsgAddrV2 {
 	return &MsgAddrV2{

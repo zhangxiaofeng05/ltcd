@@ -1,15 +1,14 @@
-coinset
-=======
+# coinset
 
 [![Build Status](http://img.shields.io/travis/btcsuite/ltcutil.svg)](https://travis-ci.org/btcsuite/btcutil)
 [![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](http://copyfree.org)
 [![GoDoc](http://img.shields.io/badge/godoc-reference-blue.svg)](http://godoc.org/github.com/ltcsuite/ltcd/ltcutil/coinset)
 
-Package coinset provides bitcoin-specific convenience functions for selecting
+Package coinset provides litecoin-specific convenience functions for selecting
 from and managing sets of unspent transaction outpoints (UTXOs).
 
-A comprehensive suite of tests is provided to ensure proper functionality.  See
-`test_coverage.txt` for the gocov coverage report.  Alternatively, if you are
+A comprehensive suite of tests is provided to ensure proper functionality. See
+`test_coverage.txt` for the gocov coverage report. Alternatively, if you are
 running a POSIX OS, you can run the `cov_report.sh` script for a real-time
 report.
 
@@ -21,10 +20,10 @@ $ go get -u github.com/ltcsuite/ltcd/ltcutil/coinset
 
 ## Usage
 
-Each unspent transaction outpoint is represented by the Coin interface.  An
+Each unspent transaction outpoint is represented by the Coin interface. An
 example of a concrete type that implements Coin is coinset.SimpleCoin.
 
-The typical use case for this library is for creating raw bitcoin transactions
+The typical use case for this library is for creating raw litecoin transactions
 given a set of Coins that may be spent by the user, for example as below:
 
 ```Go
@@ -32,9 +31,9 @@ var unspentCoins = []coinset.Coin{ ... }
 ```
 
 When the user needs to spend a certain amount, they will need to select a
-subset of these coins which contain at least that value.  CoinSelector is
+subset of these coins which contain at least that value. CoinSelector is
 an interface that represents types that implement coin selection algos,
-subject to various criteria.  There are a few examples of CoinSelector's:
+subject to various criteria. There are a few examples of CoinSelector's:
 
 - MinIndexCoinSelector
 

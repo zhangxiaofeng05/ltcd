@@ -1,15 +1,14 @@
-hdkeychain
-==========
+# hdkeychain
 
 [![Build Status](http://img.shields.io/travis/btcsuite/ltcutil.svg)](https://travis-ci.org/btcsuite/btcutil)
 [![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](http://copyfree.org)
 [![GoDoc](http://img.shields.io/badge/godoc-reference-blue.svg)](http://godoc.org/github.com/ltcsuite/ltcd/ltcutil/hdkeychain)
 
-Package hdkeychain provides an API for bitcoin hierarchical deterministic
+Package hdkeychain provides an API for litecoin hierarchical deterministic
 extended keys (BIP0032).
 
-A comprehensive suite of tests is provided to ensure proper functionality.  See
-`test_coverage.txt` for the gocov coverage report.  Alternatively, if you are
+A comprehensive suite of tests is provided to ensure proper functionality. See
+`test_coverage.txt` for the gocov coverage report. Alternatively, if you are
 running a POSIX OS, you can run the `cov_report.sh` script for a real-time
 report.
 
@@ -23,7 +22,7 @@ report.
 - Easy serialization and deserialization for both private and public extended
   keys
 - Support for custom networks by registering them with chaincfg
-- Obtaining the underlying EC pubkeys, EC privkeys, and associated bitcoin
+- Obtaining the underlying EC pubkeys, EC privkeys, and associated litecoin
   addresses ties in seamlessly with existing btcec and ltcutil types which
   provide powerful tools for working with them to do things like sign
   transations and generate payment scripts
@@ -44,13 +43,13 @@ $ go get -u github.com/ltcsuite/ltcd/ltcutil/hdkeychain
 
 ## Examples
 
-* [NewMaster Example](http://godoc.org/github.com/ltcsuite/ltcd/ltcutil/hdkeychain#example-NewMaster)  
+- [NewMaster Example](http://godoc.org/github.com/ltcsuite/ltcd/ltcutil/hdkeychain#example-NewMaster)  
   Demonstrates how to generate a cryptographically random seed then use it to
   create a new master node (extended key).
-* [Default Wallet Layout Example](http://godoc.org/github.com/ltcsuite/ltcd/ltcutil/hdkeychain#example-package--DefaultWalletLayout)  
+- [Default Wallet Layout Example](http://godoc.org/github.com/ltcsuite/ltcd/ltcutil/hdkeychain#example-package--DefaultWalletLayout)  
   Demonstrates the default hierarchical deterministic wallet layout as described
   in BIP0032.
-* [Audits Use Case Example](http://godoc.org/github.com/ltcsuite/ltcd/ltcutil/hdkeychain#example-package--Audits)  
+- [Audits Use Case Example](http://godoc.org/github.com/ltcsuite/ltcd/ltcutil/hdkeychain#example-package--Audits)  
   Demonstrates the audits use case in BIP0032.
 
 ## License

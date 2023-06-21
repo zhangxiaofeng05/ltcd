@@ -55,7 +55,7 @@ func ExampleNewAmount() {
 	// Output: 1 LTC
 	// 0.01234567 LTC
 	// 0 LTC
-	// invalid bitcoin amount
+	// invalid litecoin amount
 }
 
 func ExampleAmount_unitConversions() {

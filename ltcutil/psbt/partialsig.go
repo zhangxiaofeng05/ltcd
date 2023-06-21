@@ -2,6 +2,7 @@ package psbt
 
 import (
 	"bytes"
+
 	"github.com/ltcsuite/ltcd/btcec/v2"
 	"github.com/ltcsuite/ltcd/btcec/v2/ecdsa"
 )
@@ -28,7 +29,7 @@ func (s PartialSigSorter) Less(i, j int) bool {
 }
 
 // validatePubkey checks if pubKey is *any* valid pubKey serialization in a
-// Bitcoin context (compressed/uncomp. OK).
+// Litecoin context (compressed/uncomp. OK).
 func validatePubkey(pubKey []byte) bool {
 	_, err := btcec.ParsePubKey(pubKey)
 	return err == nil

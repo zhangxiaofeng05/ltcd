@@ -3,39 +3,39 @@
 // license that can be found in the LICENSE file.
 
 /*
-Package wire implements the bitcoin wire protocol.
+Package wire implements the litecoin wire protocol.
 
-For the complete details of the bitcoin protocol, see the official wiki entry
+For the complete details of the litecoin protocol, see the official wiki entry
 at https://en.bitcoin.it/wiki/Protocol_specification.  The following only serves
 as a quick overview to provide information on how to use the package.
 
 At a high level, this package provides support for marshalling and unmarshalling
-supported bitcoin messages to and from the wire.  This package does not deal
+supported litecoin messages to and from the wire.  This package does not deal
 with the specifics of message handling such as what to do when a message is
 received.  This provides the caller with a high level of flexibility.
 
-Bitcoin Message Overview
+# Litecoin Message Overview
 
-The bitcoin protocol consists of exchanging messages between peers.  Each
+The litecoin protocol consists of exchanging messages between peers.  Each
 message is preceded by a header which identifies information about it such as
-which bitcoin network it is a part of, its type, how big it is, and a checksum
+which litecoin network it is a part of, its type, how big it is, and a checksum
 to verify validity.  All encoding and decoding of message headers is handled by
 this package.
 
-To accomplish this, there is a generic interface for bitcoin messages named
+To accomplish this, there is a generic interface for litecoin messages named
 Message which allows messages of any type to be read, written, or passed around
 through channels, functions, etc.  In addition, concrete implementations of most
-of the currently supported bitcoin messages are provided.  For these supported
+of the currently supported litecoin messages are provided.  For these supported
 messages, all of the details of marshalling and unmarshalling to and from the
-wire using bitcoin encoding are handled so the caller doesn't have to concern
+wire using litecoin encoding are handled so the caller doesn't have to concern
 themselves with the specifics.
 
-Message Interaction
+# Message Interaction
 
-The following provides a quick summary of how the bitcoin messages are intended
+The following provides a quick summary of how the litecoin messages are intended
 to interact with one another.  As stated above, these interactions are not
 directly handled by this package.  For more in-depth details about the
-appropriate interactions, see the official bitcoin protocol wiki entry at
+appropriate interactions, see the official litecoin protocol wiki entry at
 https://en.bitcoin.it/wiki/Protocol_specification.
 
 The initial handshake consists of two peers sending each other a version message
@@ -62,13 +62,13 @@ interactions in no particular order.
 	  in BIP0031.  The BIP0031Version constant can be used to detect a recent
 	  enough protocol version for this purpose (version > BIP0031Version).
 
-Common Parameters
+# Common Parameters
 
 There are several common parameters that arise when using this package to read
-and write bitcoin messages.  The following sections provide a quick overview of
+and write litecoin messages.  The following sections provide a quick overview of
 these parameters so the next sections can build on them.
 
-Protocol Version
+# Protocol Version
 
 The protocol version should be negotiated with the remote peer at a higher
 level than this package via the version (MsgVersion) message exchange, however,
@@ -77,10 +77,10 @@ latest protocol version this package supports and is typically the value to use
 for all outbound connections before a potentially lower protocol version is
 negotiated.
 
-Litecoin Network
+# Litecoin Network
 
-The bitcoin network is a magic number which is used to identify the start of a
-message and which bitcoin network the message applies to.  This package provides
+The litecoin network is a magic number which is used to identify the start of a
+message and which litecoin network the message applies to.  This package provides
 the following constants:
 
 	wire.MainNet
@@ -88,10 +88,10 @@ the following constants:
 	wire.TestNet4 (Test network version 4)
 	wire.SimNet   (Simulation test network)
 
-Determining Message Type
+# Determining Message Type
 
-As discussed in the bitcoin message overview section, this package reads
-and writes bitcoin messages using a generic interface named Message.  In
+As discussed in the litecoin message overview section, this package reads
+and writes litecoin messages using a generic interface named Message.  In
 order to determine the actual concrete type of the message, use a type
 switch or type assertion.  An example of a type switch follows:
 
@@ -106,14 +106,14 @@ switch or type assertion.  An example of a type switch follows:
 		fmt.Printf("Number of tx in block: %v", msg.Header.TxnCount)
 	}
 
-Reading Messages
+# Reading Messages
 
-In order to unmarshall bitcoin messages from the wire, use the ReadMessage
+In order to unmarshall litecoin messages from the wire, use the ReadMessage
 function.  It accepts any io.Reader, but typically this will be a net.Conn to
-a remote node running a bitcoin peer.  Example syntax is:
+a remote node running a litecoin peer.  Example syntax is:
 
-	// Reads and validates the next bitcoin message from conn using the
-	// protocol version pver and the bitcoin network btcnet.  The returns
+	// Reads and validates the next litecoin message from conn using the
+	// protocol version pver and the litecoin network btcnet.  The returns
 	// are a wire.Message, a []byte which contains the unmarshalled
 	// raw payload, and a possible error.
 	msg, rawPayload, err := wire.ReadMessage(conn, pver, btcnet)
@@ -121,25 +121,25 @@ a remote node running a bitcoin peer.  Example syntax is:
 		// Log and handle the error
 	}
 
-Writing Messages
+# Writing Messages
 
-In order to marshall bitcoin messages to the wire, use the WriteMessage
+In order to marshall litecoin messages to the wire, use the WriteMessage
 function.  It accepts any io.Writer, but typically this will be a net.Conn to
-a remote node running a bitcoin peer.  Example syntax to request addresses
+a remote node running a litecoin peer.  Example syntax to request addresses
 from a remote peer is:
 
-	// Create a new getaddr bitcoin message.
+	// Create a new getaddr litecoin message.
 	msg := wire.NewMsgGetAddr()
 
-	// Writes a bitcoin message msg to conn using the protocol version
-	// pver, and the bitcoin network btcnet.  The return is a possible
+	// Writes a litecoin message msg to conn using the protocol version
+	// pver, and the litecoin network btcnet.  The return is a possible
 	// error.
 	err := wire.WriteMessage(conn, msg, pver, btcnet)
 	if err != nil {
 		// Log and handle the error
 	}
 
-Errors
+# Errors
 
 Errors returned by this package are either the raw errors provided by underlying
 calls to read/write from streams such as io.EOF, io.ErrUnexpectedEOF, and
@@ -147,7 +147,7 @@ io.ErrShortWrite, or of type wire.MessageError.  This allows the caller to
 differentiate between general IO errors and malformed messages through type
 assertions.
 
-Bitcoin Improvement Proposals
+# Bitcoin Improvement Proposals
 
 This package includes spec changes outlined by the following BIPs:
 

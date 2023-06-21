@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ltcsuite/ltcd/chaincfg/chainhash"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/ltcsuite/ltcd/chaincfg/chainhash"
 )
 
 // makeHeader is a convenience function to make a message header in the form of
@@ -22,8 +22,8 @@ import (
 func makeHeader(btcnet BitcoinNet, command string,
 	payloadLen uint32, checksum uint32) []byte {
 
-	// The length of a bitcoin message header is 24 bytes.
-	// 4 byte magic number of the bitcoin network + 12 byte command + 4 byte
+	// The length of a litecoin message header is 24 bytes.
+	// 4 byte magic number of the litecoin network + 12 byte command + 4 byte
 	// payload length + 4 byte checksum.
 	buf := make([]byte, 24)
 	binary.LittleEndian.PutUint32(buf, uint32(btcnet))
@@ -242,7 +242,7 @@ func TestReadMessageWireErrors(t *testing.T) {
 	tests := []struct {
 		buf     []byte     // Wire encoding
 		pver    uint32     // Protocol version for wire encoding
-		btcnet  BitcoinNet // Bitcoin network for wire encoding
+		btcnet  BitcoinNet // Litecoin network for wire encoding
 		max     int        // Max size of fixed buffer to induce errors
 		readErr error      // Expected read error
 		bytes   int        // Expected num bytes read
@@ -409,7 +409,7 @@ func TestWriteMessageWireErrors(t *testing.T) {
 	tests := []struct {
 		msg    Message    // Message to encode
 		pver   uint32     // Protocol version for wire encoding
-		btcnet BitcoinNet // Bitcoin network for wire encoding
+		btcnet BitcoinNet // Litecoin network for wire encoding
 		max    int        // Max size of fixed buffer to induce errors
 		err    error      // Expected error
 		bytes  int        // Expected num bytes written

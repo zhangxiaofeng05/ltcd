@@ -111,11 +111,11 @@ const (
 	maxWitnessItemSize = 4_000_000
 )
 
-// TxFlagMarker is the first byte of the FLAG field in a bitcoin tx
+// TxFlagMarker is the first byte of the FLAG field in a litecoin tx
 // message. It allows decoders to distinguish a regular serialized
 // transaction from one that would require a different parsing logic.
 //
-// Position of FLAG in a bitcoin tx message:
+// Position of FLAG in a litecoin tx message:
 //
 //	┌─────────┬────────────────────┬─────────────┬─────┐
 //	│ VERSION │ FLAG               │ TX-IN-COUNT │ ... │
@@ -130,7 +130,7 @@ const (
 //	└─────────────────────┴────────┘
 const TxFlagMarker = 0x00
 
-// TxFlag is the second byte of the FLAG field in a bitcoin tx message.
+// TxFlag is the second byte of the FLAG field in a litecoin tx message.
 // It indicates the decoding logic to use in the transaction parser, if
 // TxFlagMarker is detected in the tx message.
 //
@@ -204,14 +204,14 @@ func (c scriptFreeList) Return(buf []byte) {
 // the number of allocations.
 var scriptPool scriptFreeList = make(chan []byte, freeListMaxItems)
 
-// OutPoint defines a bitcoin data type that is used to track previous
+// OutPoint defines a litecoin data type that is used to track previous
 // transaction outputs.
 type OutPoint struct {
 	Hash  chainhash.Hash
 	Index uint32
 }
 
-// NewOutPoint returns a new bitcoin transaction outpoint point with the
+// NewOutPoint returns a new litecoin transaction outpoint point with the
 // provided hash and index.
 func NewOutPoint(hash *chainhash.Hash, index uint32) *OutPoint {
 	return &OutPoint{
@@ -235,7 +235,7 @@ func (o OutPoint) String() string {
 	return string(buf)
 }
 
-// TxIn defines a bitcoin transaction input.
+// TxIn defines a litecoin transaction input.
 type TxIn struct {
 	PreviousOutPoint OutPoint
 	SignatureScript  []byte
@@ -253,7 +253,7 @@ func (t *TxIn) SerializeSize() int {
 		len(t.SignatureScript)
 }
 
-// NewTxIn returns a new bitcoin transaction input with the provided
+// NewTxIn returns a new litecoin transaction input with the provided
 // previous outpoint point and signature script with a default sequence of
 // MaxTxInSequenceNum.
 func NewTxIn(prevOut *OutPoint, signatureScript []byte, witness [][]byte) *TxIn {
@@ -286,7 +286,7 @@ func (t TxWitness) SerializeSize() int {
 	return n
 }
 
-// TxOut defines a bitcoin transaction output.
+// TxOut defines a litecoin transaction output.
 type TxOut struct {
 	Value    int64
 	PkScript []byte
@@ -300,7 +300,7 @@ func (t *TxOut) SerializeSize() int {
 	return 8 + VarIntSerializeSize(uint64(len(t.PkScript))) + len(t.PkScript)
 }
 
-// NewTxOut returns a new bitcoin transaction output with the provided
+// NewTxOut returns a new litecoin transaction output with the provided
 // transaction value and public key script.
 func NewTxOut(value int64, pkScript []byte) *TxOut {
 	return &TxOut{
@@ -309,7 +309,7 @@ func NewTxOut(value int64, pkScript []byte) *TxOut {
 	}
 }
 
-// MsgTx implements the Message interface and represents a bitcoin tx message.
+// MsgTx implements the Message interface and represents a litecoin tx message.
 // It is used to deliver transaction information in response to a getdata
 // message (MsgGetData) for a given transaction.
 //
@@ -442,7 +442,7 @@ func (msg *MsgTx) Copy() *MsgTx {
 	return &newTx
 }
 
-// BtcDecode decodes r using the bitcoin protocol encoding into the receiver.
+// BtcDecode decodes r using the litecoin protocol encoding into the receiver.
 // This is part of the Message interface implementation.
 // See Deserialize for decoding transactions stored to disk, such as in a
 // database, as opposed to decoding transactions from the wire.
@@ -721,7 +721,7 @@ func (msg *MsgTx) BtcDecode(r io.Reader, pver uint32, enc MessageEncoding) error
 // Deserialize decodes a transaction from r into the receiver using a format
 // that is suitable for long-term storage such as a database while respecting
 // the Version field in the transaction.  This function differs from BtcDecode
-// in that BtcDecode decodes from the bitcoin wire protocol as it was sent
+// in that BtcDecode decodes from the litecoin wire protocol as it was sent
 // across the network.  The wire encoding can technically differ depending on
 // the protocol version and doesn't even really need to match the format of a
 // stored transaction at all.  As of the time this comment was written, the
@@ -743,7 +743,7 @@ func (msg *MsgTx) DeserializeNoWitness(r io.Reader) error {
 	return msg.BtcDecode(r, 0, BaseEncoding)
 }
 
-// BtcEncode encodes the receiver to w using the bitcoin protocol encoding.
+// BtcEncode encodes the receiver to w using the litecoin protocol encoding.
 // This is part of the Message interface implementation.
 // See Serialize for encoding transactions to be stored to disk, such as in a
 // database, as opposed to encoding transactions for the wire.
@@ -824,7 +824,7 @@ func (msg *MsgTx) HasWitness() bool {
 // Serialize encodes the transaction to w using a format that suitable for
 // long-term storage such as a database while respecting the Version field in
 // the transaction.  This function differs from BtcEncode in that BtcEncode
-// encodes the transaction to the bitcoin wire protocol in order to be sent
+// encodes the transaction to the litecoin wire protocol in order to be sent
 // across the network.  The wire encoding can technically differ depending on
 // the protocol version and doesn't even really need to match the format of a
 // stored transaction at all.  As of the time this comment was written, the
@@ -950,7 +950,7 @@ func (msg *MsgTx) PkScriptLocs() []int {
 	return pkScriptLocs
 }
 
-// NewMsgTx returns a new bitcoin tx message that conforms to the Message
+// NewMsgTx returns a new litecoin tx message that conforms to the Message
 // interface.  The return instance has a default version of TxVersion and there
 // are no transaction inputs or outputs.  Also, the lock time is set to zero
 // to indicate the transaction is valid immediately as opposed to some time in
@@ -974,7 +974,7 @@ func readOutPoint(r io.Reader, pver uint32, version int32, op *OutPoint) error {
 	return err
 }
 
-// WriteOutPoint encodes op to the bitcoin protocol encoding for an OutPoint
+// WriteOutPoint encodes op to the litecoin protocol encoding for an OutPoint
 // to w.
 func WriteOutPoint(w io.Writer, pver uint32, version int32, op *OutPoint) error {
 	_, err := w.Write(op.Hash[:])
@@ -1033,7 +1033,7 @@ func readTxIn(r io.Reader, pver uint32, version int32, ti *TxIn) error {
 	return readElement(r, &ti.Sequence)
 }
 
-// writeTxIn encodes ti to the bitcoin protocol encoding for a transaction
+// writeTxIn encodes ti to the litecoin protocol encoding for a transaction
 // input (TxIn) to w.
 func writeTxIn(w io.Writer, pver uint32, version int32, ti *TxIn) error {
 	err := WriteOutPoint(w, pver, version, &ti.PreviousOutPoint)
@@ -1062,7 +1062,7 @@ func ReadTxOut(r io.Reader, pver uint32, version int32, to *TxOut) error {
 	return err
 }
 
-// WriteTxOut encodes to into the bitcoin protocol encoding for a transaction
+// WriteTxOut encodes to into the litecoin protocol encoding for a transaction
 // output (TxOut) to w.
 //
 // NOTE: This function is exported in order to allow txscript to compute the
@@ -1076,7 +1076,7 @@ func WriteTxOut(w io.Writer, pver uint32, version int32, to *TxOut) error {
 	return WriteVarBytes(w, pver, to.PkScript)
 }
 
-// writeTxWitness encodes the bitcoin protocol encoding for a transaction
+// writeTxWitness encodes the litecoin protocol encoding for a transaction
 // input's witness into to w.
 func writeTxWitness(w io.Writer, pver uint32, version int32, wit [][]byte) error {
 	err := WriteVarInt(w, pver, uint64(len(wit)))

@@ -17,11 +17,11 @@ const (
 	MaxCFHeaderPayload = chainhash.HashSize
 
 	// MaxCFHeadersPerMsg is the maximum number of committed filter headers
-	// that can be in a single bitcoin cfheaders message.
+	// that can be in a single litecoin cfheaders message.
 	MaxCFHeadersPerMsg = 2000
 )
 
-// MsgCFHeaders implements the Message interface and represents a bitcoin
+// MsgCFHeaders implements the Message interface and represents a litecoin
 // cfheaders message.  It is used to deliver committed filter header information
 // in response to a getcfheaders message (MsgGetCFHeaders). The maximum number
 // of committed filter headers per message is currently 2000. See
@@ -45,7 +45,7 @@ func (msg *MsgCFHeaders) AddCFHash(hash *chainhash.Hash) error {
 	return nil
 }
 
-// BtcDecode decodes r using the bitcoin protocol encoding into the receiver.
+// BtcDecode decodes r using the litecoin protocol encoding into the receiver.
 // This is part of the Message interface implementation.
 func (msg *MsgCFHeaders) BtcDecode(r io.Reader, pver uint32, _ MessageEncoding) error {
 	// Read filter type
@@ -95,7 +95,7 @@ func (msg *MsgCFHeaders) BtcDecode(r io.Reader, pver uint32, _ MessageEncoding) 
 	return nil
 }
 
-// BtcEncode encodes the receiver to w using the bitcoin protocol encoding.
+// BtcEncode encodes the receiver to w using the litecoin protocol encoding.
 // This is part of the Message interface implementation.
 func (msg *MsgCFHeaders) BtcEncode(w io.Writer, pver uint32, _ MessageEncoding) error {
 	// Write filter type
@@ -142,7 +142,7 @@ func (msg *MsgCFHeaders) BtcEncode(w io.Writer, pver uint32, _ MessageEncoding) 
 
 // Deserialize decodes a filter header from r into the receiver using a format
 // that is suitable for long-term storage such as a database. This function
-// differs from BtcDecode in that BtcDecode decodes from the bitcoin wire
+// differs from BtcDecode in that BtcDecode decodes from the litecoin wire
 // protocol as it was sent across the network.  The wire encoding can
 // technically differ depending on the protocol version and doesn't even really
 // need to match the format of a stored filter header at all. As of the time
@@ -171,7 +171,7 @@ func (msg *MsgCFHeaders) MaxPayloadLength(pver uint32) uint32 {
 		(MaxCFHeaderPayload * MaxCFHeadersPerMsg)
 }
 
-// NewMsgCFHeaders returns a new bitcoin cfheaders message that conforms to
+// NewMsgCFHeaders returns a new litecoin cfheaders message that conforms to
 // the Message interface. See MsgCFHeaders for details.
 func NewMsgCFHeaders() *MsgCFHeaders {
 	return &MsgCFHeaders{

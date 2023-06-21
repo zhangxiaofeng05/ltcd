@@ -14,7 +14,7 @@ import (
 // a getcfheaders message.
 const MaxGetCFiltersReqRange = 1000
 
-// MsgGetCFilters implements the Message interface and represents a bitcoin
+// MsgGetCFilters implements the Message interface and represents a litecoin
 // getcfilters message. It is used to request committed filters for a range of
 // blocks.
 type MsgGetCFilters struct {
@@ -23,7 +23,7 @@ type MsgGetCFilters struct {
 	StopHash    chainhash.Hash
 }
 
-// BtcDecode decodes r using the bitcoin protocol encoding into the receiver.
+// BtcDecode decodes r using the litecoin protocol encoding into the receiver.
 // This is part of the Message interface implementation.
 func (msg *MsgGetCFilters) BtcDecode(r io.Reader, pver uint32, _ MessageEncoding) error {
 	err := readElement(r, &msg.FilterType)
@@ -39,7 +39,7 @@ func (msg *MsgGetCFilters) BtcDecode(r io.Reader, pver uint32, _ MessageEncoding
 	return readElement(r, &msg.StopHash)
 }
 
-// BtcEncode encodes the receiver to w using the bitcoin protocol encoding.
+// BtcEncode encodes the receiver to w using the litecoin protocol encoding.
 // This is part of the Message interface implementation.
 func (msg *MsgGetCFilters) BtcEncode(w io.Writer, pver uint32, _ MessageEncoding) error {
 	err := writeElement(w, msg.FilterType)
@@ -68,7 +68,7 @@ func (msg *MsgGetCFilters) MaxPayloadLength(pver uint32) uint32 {
 	return 1 + 4 + chainhash.HashSize
 }
 
-// NewMsgGetCFilters returns a new bitcoin getcfilters message that conforms to
+// NewMsgGetCFilters returns a new litecoin getcfilters message that conforms to
 // the Message interface using the passed parameters and defaults for the
 // remaining fields.
 func NewMsgGetCFilters(filterType FilterType, startHeight uint32,

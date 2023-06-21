@@ -27,7 +27,7 @@ func (e OutOfRangeError) Error() string {
 	return string(e)
 }
 
-// Block defines a bitcoin block that provides easier and more efficient
+// Block defines a litecoin block that provides easier and more efficient
 // manipulation of raw blocks.  It also memoizes hashes for the block and its
 // transactions on their first access so subsequent accesses don't have to
 // repeat the relatively expensive hashing operations.
@@ -216,7 +216,7 @@ func (b *Block) SetHeight(height int32) {
 	b.blockHeight = height
 }
 
-// NewBlock returns a new instance of a bitcoin block given an underlying
+// NewBlock returns a new instance of a litecoin block given an underlying
 // wire.MsgBlock.  See Block.
 func NewBlock(msgBlock *wire.MsgBlock) *Block {
 	return &Block{
@@ -225,7 +225,7 @@ func NewBlock(msgBlock *wire.MsgBlock) *Block {
 	}
 }
 
-// NewBlockFromBytes returns a new instance of a bitcoin block given the
+// NewBlockFromBytes returns a new instance of a litecoin block given the
 // serialized bytes.  See Block.
 func NewBlockFromBytes(serializedBlock []byte) (*Block, error) {
 	br := bytes.NewReader(serializedBlock)
@@ -237,7 +237,7 @@ func NewBlockFromBytes(serializedBlock []byte) (*Block, error) {
 	return b, nil
 }
 
-// NewBlockFromReader returns a new instance of a bitcoin block given a
+// NewBlockFromReader returns a new instance of a litecoin block given a
 // Reader to deserialize the block.  See Block.
 func NewBlockFromReader(r io.Reader) (*Block, error) {
 	// Deserialize the bytes into a MsgBlock.
@@ -254,7 +254,7 @@ func NewBlockFromReader(r io.Reader) (*Block, error) {
 	return &b, nil
 }
 
-// NewBlockFromBlockAndBytes returns a new instance of a bitcoin block given
+// NewBlockFromBlockAndBytes returns a new instance of a litecoin block given
 // an underlying wire.MsgBlock and the serialized bytes for it.  See Block.
 func NewBlockFromBlockAndBytes(msgBlock *wire.MsgBlock, serializedBlock []byte) *Block {
 	return &Block{

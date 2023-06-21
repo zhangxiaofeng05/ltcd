@@ -17,7 +17,7 @@ import (
 )
 
 // WriteTxWitness is a utility function due to non-exported witness
-// serialization (writeTxWitness encodes the bitcoin protocol encoding for a
+// serialization (writeTxWitness encodes the litecoin protocol encoding for a
 // transaction input's witness into w).
 func WriteTxWitness(w io.Writer, wit [][]byte) error {
 	if err := wire.WriteVarInt(w, 0, uint64(len(wit))); err != nil {

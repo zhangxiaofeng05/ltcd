@@ -750,7 +750,7 @@ func TestPsbtExtractor(t *testing.T) {
 }
 
 func TestImportFromCore1(t *testing.T) {
-	// This example #1 was created manually using Bitcoin Core 0.17 regtest.
+	// This example #1 was created manually using Litecoin Core 0.17 regtest.
 	// It contains two inputs, one p2wkh and one p2pkh (non-witness).
 	// We take the created PSBT as input, then add the fields for each input
 	// separately, then finalize and extract, and compare with the network
@@ -908,7 +908,7 @@ func TestImportFromCore1(t *testing.T) {
 }
 
 func TestImportFromCore2(t *testing.T) {
-	// This example #2 was created manually using Bitcoin Core 0.17 regtest.
+	// This example #2 was created manually using Litecoin Core 0.17 regtest.
 	// It contains two inputs, one p2sh-p2wkh and one fake utxo.
 	// The PSBT has been created with walletcreatepsbt and then partial-signed
 	// on the real input with walletprocessbst in Core.

@@ -55,7 +55,7 @@ var (
 )
 
 // encodeAddress returns a human-readable payment address given a ripemd160 hash
-// and netID which encodes the bitcoin network and address type.  It is used
+// and netID which encodes the litecoin network and address type.  It is used
 // in both pay-to-pubkey-hash (P2PKH) and pay-to-script-hash (P2SH) address
 // encoding.
 func encodeAddress(hash160 []byte, netID byte) string {
@@ -135,19 +135,19 @@ type Address interface {
 	ScriptAddress() []byte
 
 	// IsForNet returns whether or not the address is associated with the
-	// passed bitcoin network.
+	// passed litecoin network.
 	IsForNet(*chaincfg.Params) bool
 }
 
 // DecodeAddress decodes the string encoding of an address and returns
 // the Address if addr is a valid encoding for a known address type.
 //
-// The bitcoin network the address is associated with is extracted if possible.
+// The litecoin network the address is associated with is extracted if possible.
 // When the address does not encode the network, such as in the case of a raw
 // public key, the address will be associated with the passed defaultNet.
 func DecodeAddress(addr string, defaultNet *chaincfg.Params) (Address, error) {
 	// Bech32 encoded segwit addresses start with a human-readable part
-	// (hrp) followed by '1'. For Bitcoin mainnet the hrp is "bc", and for
+	// (hrp) followed by '1'. For Litecoin mainnet the hrp is "bc", and for
 	// testnet it is "tb". If the address string has a prefix that matches
 	// one of the prefixes for the known networks, we try to decode it as
 	// a segwit address.
@@ -322,7 +322,7 @@ func (a *AddressPubKeyHash) ScriptAddress() []byte {
 }
 
 // IsForNet returns whether or not the pay-to-pubkey-hash address is associated
-// with the passed bitcoin network.
+// with the passed litecoin network.
 func (a *AddressPubKeyHash) IsForNet(net *chaincfg.Params) bool {
 	return a.netID == net.PubKeyHashAddrID
 }
@@ -389,7 +389,7 @@ func (a *AddressScriptHash) ScriptAddress() []byte {
 }
 
 // IsForNet returns whether or not the pay-to-script-hash address is associated
-// with the passed bitcoin network.
+// with the passed litecoin network.
 func (a *AddressScriptHash) IsForNet(net *chaincfg.Params) bool {
 	return a.netID == net.ScriptHashAddrID
 }
@@ -472,7 +472,7 @@ func (a *AddressPubKey) serialize() []byte {
 // pay-to-pubkey-hash.  Note that the public key format (uncompressed,
 // compressed, etc) will change the resulting address.  This is expected since
 // pay-to-pubkey-hash is a hash of the serialized public key which obviously
-// differs with the format.  At the time of this writing, most Bitcoin addresses
+// differs with the format.  At the time of this writing, most Litecoin addresses
 // are pay-to-pubkey-hash constructed from the uncompressed public key.
 //
 // Part of the Address interface.
@@ -488,7 +488,7 @@ func (a *AddressPubKey) ScriptAddress() []byte {
 }
 
 // IsForNet returns whether or not the pay-to-pubkey address is associated
-// with the passed bitcoin network.
+// with the passed litecoin network.
 func (a *AddressPubKey) IsForNet(net *chaincfg.Params) bool {
 	return a.pubKeyHashID == net.PubKeyHashAddrID
 }
@@ -515,7 +515,7 @@ func (a *AddressPubKey) SetFormat(pkFormat PubKeyFormat) {
 // pay-to-pubkey-hash address.  Note that the public key format (uncompressed,
 // compressed, etc) will change the resulting address.  This is expected since
 // pay-to-pubkey-hash is a hash of the serialized public key which obviously
-// differs with the format.  At the time of this writing, most Bitcoin addresses
+// differs with the format.  At the time of this writing, most Litecoin addresses
 // are pay-to-pubkey-hash constructed from the uncompressed public key.
 func (a *AddressPubKey) AddressPubKeyHash() *AddressPubKeyHash {
 	addr := &AddressPubKeyHash{netID: a.pubKeyHashID}
@@ -557,7 +557,7 @@ func (a *AddressSegWit) ScriptAddress() []byte {
 }
 
 // IsForNet returns whether the AddressSegWit is associated with the passed
-// bitcoin network.
+// litecoin network.
 //
 // NOTE: This method is part of the Address interface.
 func (a *AddressSegWit) IsForNet(net *chaincfg.Params) bool {

@@ -769,7 +769,7 @@ func createTxRawResult(chainParams *chaincfg.Params, mtx *wire.MsgTx,
 	}
 
 	if blkHeader != nil {
-		// This is not a typo, they are identical in bitcoind as well.
+		// This is not a typo, they are identical in litecoind as well.
 		txReply.Time = blkHeader.Timestamp.Unix()
 		txReply.Blocktime = blkHeader.Timestamp.Unix()
 		txReply.BlockHash = blkHash
@@ -1964,7 +1964,7 @@ func handleGetBlockTemplateRequest(s *rpcServer, request *btcjson.TemplateReques
 
 		return nil, &btcjson.RPCError{
 			Code:    btcjson.ErrRPCClientNotConnected,
-			Message: "Bitcoin is not connected",
+			Message: "Litecoin is not connected",
 		}
 	}
 
@@ -1973,7 +1973,7 @@ func handleGetBlockTemplateRequest(s *rpcServer, request *btcjson.TemplateReques
 	if currentHeight != 0 && !s.cfg.SyncMgr.IsCurrent() {
 		return nil, &btcjson.RPCError{
 			Code:    btcjson.ErrRPCClientInInitialDownload,
-			Message: "Bitcoin is downloading blocks...",
+			Message: "Litecoin is downloading blocks...",
 		}
 	}
 
@@ -3339,7 +3339,7 @@ func handleSearchRawTransactions(s *rpcServer, cmd interface{}, closeChan <-chan
 
 		// Add the block information to the result if there is any.
 		if blkHeader != nil {
-			// This is not a typo, they are identical in Bitcoin
+			// This is not a typo, they are identical in Litecoin
 			// Core as well.
 			result.Time = blkHeader.Timestamp.Unix()
 			result.Blocktime = blkHeader.Timestamp.Unix()
@@ -3394,7 +3394,7 @@ func handleSendRawTransaction(s *rpcServer, cmd interface{}, closeChan <-chan st
 		rpcsLog.Debugf("Rejected transaction %v: %v", tx.Hash(), err)
 
 		// We'll then map the rule error to the appropriate RPC error,
-		// matching bitcoind's behavior.
+		// matching litecoind's behavior.
 		code := btcjson.ErrRPCTxError
 		if txRuleErr, ok := ruleErr.Err.(mempool.TxRuleError); ok {
 			errDesc := txRuleErr.Description
@@ -3721,7 +3721,7 @@ func handleVerifyMessage(s *rpcServer, cmd interface{}, closeChan <-chan struct{
 	pk, wasCompressed, err := ecdsa.RecoverCompact(sig,
 		expectedMessageHash)
 	if err != nil {
-		// Mirror Bitcoin Core behavior, which treats error in
+		// Mirror Litecoin Core behavior, which treats error in
 		// RecoverCompact as invalid signature.
 		return false, nil
 	}
@@ -3735,7 +3735,7 @@ func handleVerifyMessage(s *rpcServer, cmd interface{}, closeChan <-chan struct{
 	}
 	address, err := ltcutil.NewAddressPubKey(serializedPK, params)
 	if err != nil {
-		// Again mirror Bitcoin Core behavior, which treats error in public key
+		// Again mirror Litecoin Core behavior, which treats error in public key
 		// reconstruction as invalid signature.
 		return false, nil
 	}
@@ -3963,7 +3963,7 @@ type parsedRPCCmd struct {
 	err     *btcjson.RPCError
 }
 
-// standardCmdResult checks that a parsed command is a standard Bitcoin JSON-RPC
+// standardCmdResult checks that a parsed command is a standard Litecoin JSON-RPC
 // command and runs the appropriate handler to reply to the command.  Any
 // commands which are not recognized or not implemented will return an error
 // suitable for use in replies.
@@ -4188,10 +4188,10 @@ func (s *rpcServer) jsonRPCRead(w http.ResponseWriter, r *http.Request, isAdmin 
 			// must not be responded to. JSON-RPC 2.0 permits the null value as a
 			// valid request id, therefore such requests are not notifications.
 			//
-			// Bitcoin Core serves requests with "id":null or even an absent "id",
+			// Litecoin Core serves requests with "id":null or even an absent "id",
 			// and responds to such requests with "id":null in the response.
 			//
-			// Btcd does not respond to any request without and "id" or "id":null,
+			// Ltcd does not respond to any request without and "id" or "id":null,
 			// regardless the indicated JSON-RPC protocol version unless RPC quirks
 			// are enabled. With RPC quirks enabled, such requests will be responded
 			// to if the reqeust does not indicate JSON-RPC version.
@@ -4335,7 +4335,7 @@ func (s *rpcServer) jsonRPCRead(w http.ResponseWriter, r *http.Request, isAdmin 
 		rpcsLog.Errorf("Failed to write marshalled reply: %v", err)
 	}
 
-	// Terminate with newline to maintain compatibility with Bitcoin Core.
+	// Terminate with newline to maintain compatibility with Litecoin Core.
 	if err := buf.WriteByte('\n'); err != nil {
 		rpcsLog.Errorf("Failed to append terminating newline to reply: %v", err)
 	}

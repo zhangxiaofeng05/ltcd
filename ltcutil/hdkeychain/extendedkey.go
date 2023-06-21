@@ -517,8 +517,9 @@ func (k *ExtendedKey) Neuter() (*ExtendedKey, error) {
 // on the SLIP132 standard (serializable to yprv/ypub, zprv/zpub, etc.).
 //
 // References:
-//   [SLIP132]: SLIP-0132 - Registered HD version bytes for BIP-0032
-//   https://github.com/satoshilabs/slips/blob/master/slip-0132.md
+//
+//	[SLIP132]: SLIP-0132 - Registered HD version bytes for BIP-0032
+//	https://github.com/satoshilabs/slips/blob/master/slip-0132.md
 func (k *ExtendedKey) CloneWithVersion(version []byte) (*ExtendedKey, error) {
 	if len(version) != 4 {
 		// TODO: The semantically correct error to return here is
@@ -551,7 +552,7 @@ func (k *ExtendedKey) ECPrivKey() (*btcec.PrivateKey, error) {
 	return privKey, nil
 }
 
-// Address converts the extended key to a standard bitcoin pay-to-pubkey-hash
+// Address converts the extended key to a standard litecoin pay-to-pubkey-hash
 // address for the passed network.
 func (k *ExtendedKey) Address(net *chaincfg.Params) (*ltcutil.AddressPubKeyHash, error) {
 	pkHash := ltcutil.Hash160(k.pubKeyBytes())
@@ -599,7 +600,7 @@ func (k *ExtendedKey) String() string {
 }
 
 // IsForNet returns whether or not the extended key is associated with the
-// passed bitcoin network.
+// passed litecoin network.
 func (k *ExtendedKey) IsForNet(net *chaincfg.Params) bool {
 	return bytes.Equal(k.version, net.HDPrivateKeyID[:]) ||
 		bytes.Equal(k.version, net.HDPublicKeyID[:])

@@ -60,7 +60,7 @@ const (
 	AddrV2Version uint32 = 70016
 )
 
-// ServiceFlag identifies services supported by a bitcoin peer.
+// ServiceFlag identifies services supported by a litecoin peer.
 type ServiceFlag uint64
 
 const (
@@ -139,7 +139,7 @@ func (f ServiceFlag) String() string {
 	return s
 }
 
-// BitcoinNet represents which bitcoin network a message belongs to.
+// BitcoinNet represents which litecoin network a message belongs to.
 type BitcoinNet uint32
 
 // Constants used to indicate the message litecoin network.  They can also be
@@ -160,7 +160,7 @@ const (
 	SimNet BitcoinNet = 0x12141c16
 )
 
-// bnStrings is a map of bitcoin networks back to their constant names for
+// bnStrings is a map of litecoin networks back to their constant names for
 // pretty printing.
 var bnStrings = map[BitcoinNet]string{
 	MainNet:  "MainNet",

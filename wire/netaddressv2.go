@@ -76,7 +76,7 @@ func isOnionCatTor(ip net.IP) bool {
 type NetAddressV2 struct {
 	// Last time the address was seen. This is, unfortunately, encoded as a
 	// uint32 on the wire and therefore is limited to 2106. This field is
-	// not present in the bitcoin version message (MsgVersion) nor was it
+	// not present in the litecoin version message (MsgVersion) nor was it
 	// added until protocol version >= NetAddressTimeVersion.
 	Timestamp time.Time
 
@@ -370,7 +370,7 @@ func readNetAddressV2(r io.Reader, pver uint32, na *NetAddressV2) error {
 		}
 
 		// BIP-155 does not specify to validate the public key here.
-		// bitcoind does not validate the ed25519 pubkey.
+		// litecoind does not validate the ed25519 pubkey.
 		na.Addr = addr
 	case i2p:
 		addr := &i2pAddr{}

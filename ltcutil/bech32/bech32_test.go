@@ -35,7 +35,7 @@ func TestBech32(t *testing.T) {
 		{"1checkupstagehandshakeupstreamerranterredcaperred2y9e3w", ErrInvalidSeparatorIndex(0)},                                 // empty hrp
 		{"11qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqc8247j", ErrInvalidLength(91)},    // too long
 
-		// Additional test vectors used in bitcoin core
+		// Additional test vectors used in litecoin core
 		{" 1nwldj5", ErrInvalidCharacter(' ')},
 		{"\x7f" + "1axkwrx", ErrInvalidCharacter(0x7f)},
 		{"\x801eym55h", ErrInvalidCharacter(0x80)},
@@ -104,7 +104,7 @@ func TestBech32M(t *testing.T) {
 		{"split1checkupstagehandshakeupstreamerranterredcaperredlc445v", nil},
 		{"?1v759aa", nil},
 
-		// Additional test vectors used in bitcoin core
+		// Additional test vectors used in litecoin core
 		{"\x201xj0phk", ErrInvalidCharacter('\x20')},
 		{"\x7f1g6xzxy", ErrInvalidCharacter('\x7f')},
 		{"\x801vctc34", ErrInvalidCharacter('\x80')},
