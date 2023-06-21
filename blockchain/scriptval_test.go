@@ -4,37 +4,46 @@
 
 package blockchain
 
-// TODO(Litecoin): disable test until testfile is available
+import (
+	"fmt"
+	"testing"
+)
+
 // TestCheckBlockScripts ensures that validating the all of the scripts in a
 // known-good block doesn't return an error.
-// func TestCheckBlockScripts(t *testing.T) {
-// 	testBlockNum := 277647
-// 	blockDataFile := fmt.Sprintf("%d.dat.bz2", testBlockNum)
-// 	blocks, err := loadBlocks(blockDataFile)
-// 	if err != nil {
-// 		t.Errorf("Error loading file: %v\n", err)
-// 		return
-// 	}
-// 	if len(blocks) > 1 {
-// 		t.Errorf("The test block file must only have one block in it")
-// 		return
-// 	}
-// 	if len(blocks) == 0 {
-// 		t.Errorf("The test block file may not be empty")
-// 		return
-// 	}
+func TestCheckBlockScripts(t *testing.T) {
+	testBlockNum := 277645
+	blockDataFile := fmt.Sprintf("%d.dat.bz2", testBlockNum)
+	blocks, err := loadBlocks(blockDataFile)
+	if err != nil {
+		t.Errorf("Error loading file: %v\n", err)
+		return
+	}
+	if len(blocks) > 1 {
+		t.Errorf("The test block file must only have one block in it")
+		return
+	}
+	if len(blocks) == 0 {
+		t.Errorf("The test block file may not be empty")
+		return
+	}
 
-// 	storeDataFile := fmt.Sprintf("%d.utxostore.bz2", testBlockNum)
-// 	view, err := loadUtxoView(storeDataFile)
-// 	if err != nil {
-// 		t.Errorf("Error loading txstore: %v\n", err)
-// 		return
-// 	}
+	// TODO(Litecoin): disable test until testfile is available
+	// storeDataFile := fmt.Sprintf("%d.utxostore.bz2", testBlockNum)
 
-// 	scriptFlags := txscript.ScriptBip16
-// 	err = checkBlockScripts(blocks[0], view, scriptFlags, nil, nil)
-// 	if err != nil {
-// 		t.Errorf("Transaction script validation failed: %v\n", err)
-// 		return
-// 	}
-// }
+	// <tx hash><output index><serialized utxo len><serialized utxo>
+	// <32 bytes>
+	// <4660827EC811AE515BF611FB732CDEF3D634887E78F46510D3ACC0128C337B4A>
+	// view, err := loadUtxoView(storeDataFile)
+	// if err != nil {
+	// 	t.Errorf("Error loading txstore: %v\n", err)
+	// 	return
+	// }
+
+	// scriptFlags := txscript.ScriptBip16
+	// err = checkBlockScripts(blocks[0], view, scriptFlags, nil, nil)
+	// if err != nil {
+	// 	t.Errorf("Transaction script validation failed: %v\n", err)
+	// 	return
+	// }
+}
