@@ -1,6 +1,6 @@
 # Update
 
-* Run the following commands to update btcd, all dependencies, and install it:
+- Run the following commands to update ltcd, all dependencies, and install it:
 
 ```bash
 cd $GOPATH/src/github.com/ltcsuite/ltcd

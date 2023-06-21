@@ -1,12 +1,11 @@
-btcjson
-=======
+# btcjson
 
 [![Build Status](https://github.com/ltcsuite/ltcd/workflows/Build%20and%20Test/badge.svg)](https://github.com/ltcsuite/ltcd/actions)
 [![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](http://copyfree.org)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://pkg.go.dev/github.com/ltcsuite/ltcd/btcjson)
 
 Package btcjson implements concrete types for marshalling to and from the
-bitcoin JSON-RPC API.  A comprehensive suite of tests is provided to ensure
+bitcoin JSON-RPC API. A comprehensive suite of tests is provided to ensure
 proper functionality.
 
 Although this package was primarily written for the btcsuite, it has
@@ -15,7 +14,7 @@ projects needing to marshal to and from bitcoin JSON-RPC requests and responses.
 
 Note that although it's possible to use this package directly to implement an
 RPC client, it is not recommended since it is only intended as an infrastructure
-package.  Instead, RPC clients should use the
+package. Instead, RPC clients should use the
 [btcrpcclient](https://github.com/roasbeef/btcrpcclient) package which provides
 a full blown RPC client with many features such as automatic connection
 management, websocket support, automatic notification re-registration on
@@ -30,30 +29,31 @@ $ go get -u github.com/ltcsuite/ltcd/btcjson
 
 ## Examples
 
-* [Marshal Command](https://pkg.go.dev/github.com/ltcsuite/ltcd/btcjson#example-MarshalCmd)  
+- [Marshal Command](https://pkg.go.dev/github.com/ltcsuite/ltcd/btcjson#example-MarshalCmd)  
   Demonstrates how to create and marshal a command into a JSON-RPC request.
 
-* [Unmarshal Command](https://pkg.go.dev/github.com/ltcsuite/ltcd/btcjson#example-UnmarshalCmd)  
+- [Unmarshal Command](https://pkg.go.dev/github.com/ltcsuite/ltcd/btcjson#example-UnmarshalCmd)  
   Demonstrates how to unmarshal a JSON-RPC request and then unmarshal the
   concrete request into a concrete command.
 
-* [Marshal Response](https://pkg.go.dev/github.com/ltcsuite/ltcd/btcjson#example-MarshalResponse)  
+- [Marshal Response](https://pkg.go.dev/github.com/ltcsuite/ltcd/btcjson#example-MarshalResponse)  
   Demonstrates how to marshal a JSON-RPC response.
 
-* [Unmarshal Response](https://pkg.go.dev/github.com/ltcsuite/ltcd/btcjson#example-package--UnmarshalResponse)  
+- [Unmarshal Response](https://pkg.go.dev/github.com/ltcsuite/ltcd/btcjson#example-package--UnmarshalResponse)  
   Demonstrates how to unmarshal a JSON-RPC response and then unmarshal the
   result field in the response to a concrete type.
 
 ## GPG Verification Key
 
 All official release tags are signed by Conformal so users can ensure the code
-has not been tampered with and is coming from the btcsuite developers.  To
+has not been tampered with and is coming from the ltcsuite developers. To
 verify the signature perform the following:
 
 - Download the public key from the Conformal website at
   https://opensource.conformal.com/GIT-GPG-KEY-conformal.txt
 
 - Import the public key into your GPG keyring:
+
   ```bash
   gpg --import GIT-GPG-KEY-conformal.txt
   ```

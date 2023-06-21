@@ -1,13 +1,13 @@
 # Contact
 
-## IRC
+## Email
 
-* [irc.libera.chat](irc://irc.libera.chat), channel `#btcd`
+- losh11@litecoin.net - please email the maintainer for any security diclosures.
 
 ## Mailing Lists
 
-* [btcd](mailto:btcd+subscribe@opensource.conformal.com): discussion of btcd and its packages.
-* [btcd-commits](mailto:btcd-commits+subscribe@opensource.conformal.com): readonly mail-out of source code changes.
+- [btcd](mailto:btcd+subscribe@opensource.conformal.com): discussion of btcd and its packages.
+- [btcd-commits](mailto:btcd-commits+subscribe@opensource.conformal.com): readonly mail-out of source code changes.
 
 ## Issue Tracker
 

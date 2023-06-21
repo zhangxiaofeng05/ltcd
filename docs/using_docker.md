@@ -12,13 +12,13 @@
 
 ## Introduction
 
-With Docker you can easily set up _ltcd_ to run your Bitcoin full node. You can find the official _ltcd_ Docker images on Docker Hub [ltcsuite/ltcd](https://hub.docker.com/r/ltcsuite/ltcd). The Docker source file of this image is located at [Dockerfile](https://github.com/ltcsuite/ltcd/blob/master/Dockerfile).
+With Docker you can easily set up _ltcd_ to run your Litecoin full node. You can find the official _ltcd_ Docker images on Docker Hub [ltcsuite/ltcd](https://hub.docker.com/r/ltcsuite/ltcd). The Docker source file of this image is located at [Dockerfile](https://github.com/ltcsuite/ltcd/blob/master/Dockerfile).
 
 This documentation focuses on running Docker container with _docker-compose.yml_ files. These files are better to read and you can use them as a template for your own use. For more information about Docker and Docker compose visit the official [Docker documentation](https://docs.docker.com/).
 
 ## Docker volumes
 
-**Special diskspace hint**: The following examples are using a Docker managed volume. The volume is named _ltcd-data_ This will use a lot of disk space, because it contains the full Bitcoin blockchain. Please make yourself familiar with [Docker volumes](https://docs.docker.com/storage/volumes/).
+**Special diskspace hint**: The following examples are using a Docker managed volume. The volume is named _ltcd-data_ This will use a lot of disk space, because it contains the full Litecoin blockchain. Please make yourself familiar with [Docker volumes](https://docs.docker.com/storage/volumes/).
 
 The _ltcd-data_ volume will be reused, if you upgrade your _docker-compose.yml_ file. Keep in mind, that it is not automatically removed by Docker, if you delete the ltcd container. If you don't need the volume anymore, please delete it manually with the command:
 
@@ -36,7 +36,7 @@ We pass all needed arguments to _ltcd_ as command line parameters in our _docker
 ```bash
 Error creating a default config file: open /sample-ltcd.conf: no such file or directory
 ...
-[WRN] BTCD: open /root/.ltcd/ltcd.conf: no such file or directory
+[WRN] LTCD: open /root/.ltcd/ltcd.conf: no such file or directory
 ```
 
 ## Examples

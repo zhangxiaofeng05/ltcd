@@ -1,5 +1,4 @@
-chaincfg
-========
+# chaincfg
 
 [![Build Status](https://github.com/ltcsuite/ltcd/workflows/Build%20and%20Test/badge.svg)](https://github.com/ltcsuite/ltcd/actions)
 [![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](http://copyfree.org)
@@ -62,13 +61,14 @@ $ go get -u github.com/ltcsuite/ltcd/chaincfg
 ## GPG Verification Key
 
 All official release tags are signed by Conformal so users can ensure the code
-has not been tampered with and is coming from the btcsuite developers.  To
+has not been tampered with and is coming from the ltcsuite developers. To
 verify the signature perform the following:
 
 - Download the public key from the Conformal website at
   https://opensource.conformal.com/GIT-GPG-KEY-conformal.txt
 
 - Import the public key into your GPG keyring:
+
   ```bash
   gpg --import GIT-GPG-KEY-conformal.txt
   ```

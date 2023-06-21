@@ -1,6 +1,6 @@
-# `btcd`'s Reproducible Build System
+# `ltcd`'s Reproducible Build System
 
-This package contains the build script that the `btcd` project uses in order to
+This package contains the build script that the `ltcd` project uses in order to
 build binaries for each new release. As of `go1.13`, with some new build flags,
 binaries are now reproducible, allowing developers to build the binary on
 distinct machines, and end up with a byte-for-byte identical binary.
@@ -20,6 +20,7 @@ The CHANGES file should be a changelog that roughly mirrors the release notes.
 Generally, the PRs that have been merged since the last release have been
 listed in the CHANGES file and categorized.
 For example, these changes have had the following format in the past:
+
 ```
 Changes in X.YY.Z (Month Day Year):
   - Protocol and Network-related changes:
@@ -39,27 +40,30 @@ Changes in X.YY.Z (Month Day Year):
 
 If the previous tag is, for example, `vA.B.C`, then you can get the list of
 contributors (from `vA.B.C` until the current `HEAD`) using the following command:
+
 ```bash
 git log vA.B.C..HEAD --pretty="%an" | sort | uniq
 ```
+
 After committing changes to the CHANGES file, the tagged release commit
 should be created.
 
 The tagged commit should be a commit that bumps version numbers in `version.go`
-and `cmd/btcctl/version.go`.
+and `cmd/ltcctl/version.go`.
 For example (taken from [f3ec130](https://github.com/ltcsuite/ltcd/commit/f3ec13030e4e828869954472cbc51ac36bee5c1d)):
+
 ```diff
-diff --git a/cmd/btcctl/version.go b/cmd/btcctl/version.go
+diff --git a/cmd/ltcctl/version.go b/cmd/ltcctl/version.go
 index 2195175c71..f65cacef7e 100644
---- a/cmd/btcctl/version.go
-+++ b/cmd/btcctl/version.go
+--- a/cmd/ltcctl/version.go
++++ b/cmd/ltcctl/version.go
 @@ -18,7 +18,7 @@ const semanticAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqr
  const (
  	appMajor uint = 0
  	appMinor uint = 20
 -	appPatch uint = 0
 +	appPatch uint = 1
- 
+
  	// appPreRelease MUST only contain characters from semanticAlphabet
  	// per the semantic versioning spec.
 diff --git a/version.go b/version.go
@@ -72,7 +76,7 @@ index 92fd60fdd4..fba55b5a37 100644
  	appMinor uint = 20
 -	appPatch uint = 0
 +	appPatch uint = 1
- 
+
  	// appPreRelease MUST only contain characters from semanticAlphabet
  	// per the semantic versioning spec.
 ```
@@ -89,26 +93,29 @@ binaries at the moment is by using the Windows Subsystem Linux. One can build
 the release binaries following these steps:
 
 1. `git clone https://github.com/ltcsuite/ltcd.git`
-2. `cd btcd`
+2. `cd ltcd`
 3. `./release/release.sh <TAG> # <TAG> is the name of the next release/tag`
 
-This will then create a directory of the form `btcd-<TAG>` containing archives
+This will then create a directory of the form `ltcd-<TAG>` containing archives
 of the release binaries for each supported operating system and architecture,
 and a manifest file containing the hash of each archive.
 
 ### Pushing a release (for maintainers)
 
-Now that the directory `btcd-<TAG>` is created, the manifest file needs to be
+Now that the directory `ltcd-<TAG>` is created, the manifest file needs to be
 signed by a maintainer and the release files need to be published to GitHub.
 
 Sign the `manifest-<TAG>.txt` file like so:
+
 ```sh
 gpg --sign --detach-sig manifest-<TAG>.txt
 ```
+
 This will create a file named `manifest-<TAG>.txt.sig`, which will must
 be included in the release files later.
 
 #### Note before publishing
+
 Before publishing, go through the reproducible build process that is outlined
 in this document with the files created from `release/release.sh`. This includes
 verifying commit and tag signatures using `git verify-commit` and git `verify-tag`
@@ -126,7 +133,7 @@ file.
 It's important to include the Go version used to produce the release files in
 the release notes, so users know the correct version of Go to use to reproduce
 and verify the build.
-When following the GitHub documentation, include every file in the `btcd-<TAG>`
+When following the GitHub documentation, include every file in the `ltcd-<TAG>`
 directory.
 
 At this point, a signed commit and tag on that commit should be pushed to the main
@@ -154,11 +161,11 @@ Once done, verifiers can proceed with the following steps:
    operating system and architecture, and the manifest file along with its
    signature.
 2. Verify the signature of the manifest file with `gpg --verify
-   manifest-<TAG>.txt.sig`. This will require obtaining the PGP keys which
+manifest-<TAG>.txt.sig`. This will require obtaining the PGP keys which
    signed the manifest file, which are included in the release notes.
 3. Recompute the `SHA256` hash of the archive with `shasum -a 256 <filename>`,
    locate the corresponding one in the manifest file, and ensure they match
-   __exactly__.
+   **exactly**.
 
 At this point, verifiers can use the release binaries acquired if they trust
 the integrity of the release manager(s). Otherwise, one can proceed with the
@@ -168,14 +175,14 @@ and `go` (matching the same version used in the release):
 4. Extract the release binaries contained within the archive, compute their
    hashes as done above, and note them down.
 5. Ensure `go` is installed, matching the same version as noted in the release
-   notes. 
-6. Obtain a copy of `btcd`'s source code with `git clone
-   https://github.com/ltcsuite/ltcd` and checkout the source code of the
+   notes.
+6. Obtain a copy of `ltcd`'s source code with `git clone
+https://github.com/ltcsuite/ltcd` and checkout the source code of the
    release with `git checkout <TAG>`.
 7. Proceed to verify the tag with `git verify-tag <TAG>` and compile the
    binaries from source for the intended operating system and architecture with
-   `BTCDBUILDSYS=OS-ARCH ./release/release.sh <TAG>`.
-8. Extract the archive found in the `btcd-<TAG>` directory created by the
-   release script and recompute the `SHA256` hash of the release binaries (btcd
-   and btcctl) with `shasum -a 256 <filename>`. These should match __exactly__
+   `LTCDBUILDSYS=OS-ARCH ./release/release.sh <TAG>`.
+8. Extract the archive found in the `ltcd-<TAG>` directory created by the
+   release script and recompute the `SHA256` hash of the release binaries (ltcd
+   and ltcctl) with `shasum -a 256 <filename>`. These should match **exactly**
    as the ones noted above.
