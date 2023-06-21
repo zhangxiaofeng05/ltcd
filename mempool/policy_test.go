@@ -218,6 +218,14 @@ func TestDust(t *testing.T) {
 		relayFee ltcutil.Amount // minimum relay transaction fee.
 		isDust   bool
 	}{
+		// TODO (Litecoin): GetDustThreshold * 10 returns error
+		// {
+		// 	// Maximum allowed value is never dust.
+		// 	"max satoshi amount is never dust",
+		// 	wire.TxOut{Value: ltcutil.MaxSatoshi, PkScript: pkScript},
+		// 	ltcutil.MaxSatoshi,
+		// 	false,
+		// },
 		{
 			// Any value is allowed with a zero relay fee.
 			"zero value with zero relay fee",
