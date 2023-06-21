@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/davecgh/go-spew v1.1.1
-	github.com/ltcsuite/ltcd v0.23.0
+	github.com/ltcsuite/ltcd v0.23.4
 	github.com/ltcsuite/ltcd/btcec/v2 v2.1.3
 	github.com/ltcsuite/ltcd/chaincfg/chainhash v1.0.2
 	github.com/ltcsuite/ltcd/ltcutil v1.1.0
