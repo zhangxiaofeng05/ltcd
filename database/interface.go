@@ -337,7 +337,7 @@ type Tx interface {
 	// FetchBlockRegion returns the raw serialized bytes for the given
 	// block region.
 	//
-	// For example, it is possible to directly extract Bitcoin transactions
+	// For example, it is possible to directly extract Litecoin transactions
 	// and/or scripts from a block with this function.  Depending on the
 	// backend implementation, this can provide significant savings by
 	// avoiding the need to load entire blocks.
@@ -364,7 +364,7 @@ type Tx interface {
 	// FetchBlockRegions returns the raw serialized bytes for the given
 	// block regions.
 	//
-	// For example, it is possible to directly extract Bitcoin transactions
+	// For example, it is possible to directly extract Litecoin transactions
 	// and/or scripts from various blocks with this function.  Depending on
 	// the backend implementation, this can provide significant savings by
 	// avoiding the need to load entire blocks.
@@ -389,6 +389,26 @@ type Tx interface {
 	// implementations.
 	FetchBlockRegions(regions []BlockRegion) ([][]byte, error)
 
+	// PruneBlocks deletes the block files until it reaches the target size
+	// (specificed in bytes).
+	//
+	// The interface contract guarantees at least the following errors will
+	// be returned (other implementation-specific errors are possible):
+	//   - ErrTxNotWritable if attempted against a read-only transaction
+	//   - ErrTxClosed if the transaction has already been closed
+	//
+	// NOTE: The data returned by this function is only valid during a
+	// database transaction.  Attempting to access it after a transaction
+	// has ended results in undefined behavior.  This constraint prevents
+	// additional data copies and allows support for memory-mapped database
+	// implementations.
+	PruneBlocks(targetSize uint64) ([]chainhash.Hash, error)
+
+	// BeenPruned returns if the block storage has ever been pruned.
+	//
+	// Implementation specific errors are possible.
+	BeenPruned() (bool, error)
+
 	// ******************************************************************
 	// Methods related to both atomic metadata storage and block storage.
 	// ******************************************************************
@@ -408,7 +428,7 @@ type Tx interface {
 	Rollback() error
 }
 
-// DB provides a generic interface that is used to store bitcoin blocks and
+// DB provides a generic interface that is used to store litecoin blocks and
 // related metadata.  This interface is intended to be agnostic to the actual
 // mechanism used for backend data storage.  The RegisterDriver function can be
 // used to add a new backend data storage method.

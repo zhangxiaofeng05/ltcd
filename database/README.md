@@ -17,7 +17,7 @@ likely want to use the [rpcclient](https://github.com/ltcsuite/ltcd/tree/master/
 package which makes use of the [JSON-RPC API](https://github.com/ltcsuite/ltcd/tree/master/docs/json_rpc_api.md).
 
 However, this package could be extremely useful for any applications requiring
-Bitcoin block storage capabilities.
+Litecoin block storage capabilities.
 
 The default backend, ffldb, has a strong focus on speed, efficiency, and
 robustness.  It makes use of leveldb for the metadata, flat files for block
@@ -26,7 +26,7 @@ storage, and strict checksums in key areas to ensure data integrity.
 ## Feature Overview
 
 - Key/value metadata store
-- Bitcoin block storage
+- Litecoin block storage
 - Efficient retrieval of block headers and regions (transactions, scripts, etc)
 - Read-only and read-write transactions with both manual and managed modes
 - Nested buckets

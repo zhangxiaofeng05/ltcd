@@ -81,14 +81,14 @@ const (
 
 	// SFNodeCF is a flag used to indicate a peer supports committed
 	// filters (CFs).
-	SFNodeCF ServiceFlag = 1 << 6
+	SFNodeCF = 1 << 6
 
 	// SFNodeNetworkLimited is a flag used to indicate a peer supports serving
 	// the last 288 blocks.
-	SFNodeNetworkLimited ServiceFlag = 1 << 10
+	SFNodeNetworkLimited = 1 << 10
 
 	// SFNodeMWEB is a flag used to indicate a peer support MWEB blocks
-	SFNodeMWEB ServiceFlag = 1 << 24
+	SFNodeMWEB = 1 << 24
 )
 
 // Map of service flags back to their constant names for pretty printing.

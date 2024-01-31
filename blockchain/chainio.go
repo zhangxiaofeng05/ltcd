@@ -243,10 +243,10 @@ type SpentTxOut struct {
 	// Amount is the amount of the output.
 	Amount int64
 
-	// PkScipt is the the public key script for the output.
+	// PkScipt is the public key script for the output.
 	PkScript []byte
 
-	// Height is the height of the the block containing the creating tx.
+	// Height is the height of the block containing the creating tx.
 	Height int32
 
 	// Denotes if the creating tx is a coinbase.
@@ -494,11 +494,26 @@ func dbRemoveSpendJournalEntry(dbTx database.Tx, blockHash *chainhash.Hash) erro
 	return spendBucket.Delete(blockHash[:])
 }
 
+// dbPruneSpendJournalEntry uses an existing database transaction to remove all
+// the spend journal entries for the pruned blocks.
+func dbPruneSpendJournalEntry(dbTx database.Tx, blockHashes []chainhash.Hash) error {
+	spendBucket := dbTx.Metadata().Bucket(spendJournalBucketName)
+
+	for _, blockHash := range blockHashes {
+		err := spendBucket.Delete(blockHash[:])
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // -----------------------------------------------------------------------------
 // The unspent transaction output (utxo) set consists of an entry for each
 // unspent output using a format that is optimized to reduce space using domain
 // specific compression algorithms.  This format is a slightly modified version
-// of the format used in Bitcoin Core.
+// of the format used in Litecoin Core.
 //
 // Each entry is keyed by an outpoint as specified below.  It is important to
 // note that the key encoding uses a VLQ, which employs an MSB encoding so
@@ -1236,7 +1251,7 @@ func (b *BlockChain) initChainState() error {
 		blockWeight := uint64(GetBlockWeight(ltcutil.NewBlock(&block)))
 		numTxns := uint64(len(block.Transactions))
 		b.stateSnapshot = newBestState(tip, blockSize, blockWeight,
-			numTxns, state.totalTxns, tip.CalcPastMedianTime())
+			numTxns, state.totalTxns, CalcPastMedianTime(tip))
 
 		return nil
 	})

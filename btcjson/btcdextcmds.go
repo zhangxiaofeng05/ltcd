@@ -45,13 +45,13 @@ func NewNodeCmd(subCmd NodeSubCmd, target string, connectSubCmd *string) *NodeCm
 }
 
 // DebugLevelCmd defines the debuglevel JSON-RPC command.  This command is not a
-// standard Bitcoin command.  It is an extension for ltcd.
+// standard Litecoin command.  It is an extension for ltcd.
 type DebugLevelCmd struct {
 	LevelSpec string
 }
 
 // NewDebugLevelCmd returns a new DebugLevelCmd which can be used to issue a
-// debuglevel JSON-RPC command.  This command is not a standard Bitcoin command.
+// debuglevel JSON-RPC command.  This command is not a standard Litecoin command.
 // It is an extension for ltcd.
 func NewDebugLevelCmd(levelSpec string) *DebugLevelCmd {
 	return &DebugLevelCmd{

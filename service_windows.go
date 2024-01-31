@@ -25,7 +25,7 @@ const (
 	svcDisplayName = "Ltcd Service"
 
 	// svcDesc is the description of the service.
-	svcDesc = "Downloads and stays synchronized with the bitcoin block " +
+	svcDesc = "Downloads and stays synchronized with the litecoin block " +
 		"chain and provides chain services to applications."
 )
 

@@ -140,7 +140,7 @@ func newMemWallet(net *chaincfg.Params, harnessID uint32) (*memWallet, error) {
 	}
 
 	// Track the coinbase generation address to ensure we properly track
-	// newly generated bitcoin we can spend.
+	// newly generated litecoin we can spend.
 	addrs := make(map[uint32]ltcutil.Address)
 	addrs[0] = coinbaseAddr
 
@@ -374,7 +374,7 @@ func (m *memWallet) NewAddress() (ltcutil.Address, error) {
 	return m.newAddress()
 }
 
-// fundTx attempts to fund a transaction sending amt bitcoin. The coins are
+// fundTx attempts to fund a transaction sending amt litecoin. The coins are
 // selected such that the final amount spent pays enough fees as dictated by the
 // passed fee rate. The passed fee rate should be expressed in
 // satoshis-per-byte. The transaction being funded can optionally include a

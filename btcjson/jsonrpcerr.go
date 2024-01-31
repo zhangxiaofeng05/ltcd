@@ -79,7 +79,7 @@ const (
 
 // Peer-to-peer client errors.
 const (
-	// ErrRPCClientNotConnected indicates that Bitcoin is not connected.
+	// ErrRPCClientNotConnected indicates that Litecoin is not connected.
 	ErrRPCClientNotConnected RPCErrorCode = -9
 
 	// ErrRPCClientInInitialDownload indicates that client is still downloading
@@ -154,7 +154,7 @@ const (
 	// which does not exist. It can also indicate an attempt to unload a
 	// wallet that was not previously loaded.
 	//
-	// Not to be confused with ErrRPCNoWallet, which is specific to btcd.
+	// Not to be confused with ErrRPCNoWallet, which is specific to ltcd.
 	ErrRPCWalletNotFound RPCErrorCode = -18
 
 	// ErrRPCWalletNotSpecified indicates that no wallet was specified, for

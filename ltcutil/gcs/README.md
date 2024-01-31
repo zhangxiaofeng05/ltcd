@@ -1,8 +1,8 @@
 gcs
 ==========
 
-[![Build Status](http://img.shields.io/travis/btcsuite/ltcutil.svg)]
-(https://travis-ci.org/btcsuite/btcutil) [![ISC License]
+[![Build Status](http://img.shields.io/travis/ltcsuite/ltcutil.svg)]
+(https://travis-ci.org/ltcsuite/ltcutil) [![ISC License]
 (http://img.shields.io/badge/license-ISC-blue.svg)](http://copyfree.org)
 [![GoDoc](https://godoc.org/github.com/ltcsuite/ltcd/ltcutil/gcs?status.png)]
 (http://godoc.org/github.com/ltcsuite/ltcd/ltcutil/gcs)

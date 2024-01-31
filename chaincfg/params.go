@@ -39,13 +39,13 @@ var (
 	// can have for the simulation test network.  It is the value 2^255 - 1.
 	simNetPowLimit = new(big.Int).Sub(new(big.Int).Lsh(bigOne, 255), bigOne)
 
-	// sigNetPowLimit is the highest proof of work value a bitcoin block can
+	// sigNetPowLimit is the highest proof of work value a litecoin block can
 	// have for the signet test network. It is the value 0x0377ae << 216.
 	sigNetPowLimit = new(big.Int).Lsh(new(big.Int).SetInt64(0x0377ae), 216)
 
 	// DefaultSignetChallenge is the byte representation of the signet
 	// challenge for the default (public, Taproot enabled) signet network.
-	// This is the binary equivalent of the bitcoin script
+	// This is the binary equivalent of the litecoin script
 	//  1 03ad5e0edad18cb1f0fc0d28a3d4f1f3e445640337489abb10404f2d1e086be430
 	//  0359ef5021964fe22d6f8e05b2463c9540ce96883fe3b278760f048f5189f2e6c4 2
 	//  OP_CHECKMULTISIG
@@ -181,6 +181,11 @@ type Params struct {
 	// PowLimitBits defines the highest allowed proof of work value for a
 	// block in compact form.
 	PowLimitBits uint32
+
+	// PoWNoRetargeting defines whether the network has difficulty
+	// retargeting enabled or not. This should only be set to true for
+	// regtest like networks.
+	PoWNoRetargeting bool
 
 	// These fields define the block heights at which the specified softfork
 	// BIP became active.
@@ -414,6 +419,7 @@ var RegressionNetParams = Params{
 	GenesisHash:              &regTestGenesisHash,
 	PowLimit:                 regressionPowLimit,
 	PowLimitBits:             0x207fffff,
+	PoWNoRetargeting:         true,
 	CoinbaseMaturity:         100,
 	BIP0034Height:            100000000, // Not active - Permit ver 1 blocks
 	BIP0065Height:            1351,      // Used by regression tests
@@ -741,7 +747,7 @@ var SimNetParams = Params{
 }
 
 // SigNetParams defines the network parameters for the default public signet
-// Bitcoin network. Not to be confused with the regression test network, this
+// Litecoin network. Not to be confused with the regression test network, this
 // network is sometimes simply called "signet" or "taproot signet".
 var SigNetParams = CustomSignetParams(
 	DefaultSignetChallenge, DefaultSignetDNSSeeds,

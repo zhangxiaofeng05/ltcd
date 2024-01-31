@@ -10,7 +10,7 @@ import (
 )
 
 // activeNetParams is a pointer to the parameters specific to the
-// currently active bitcoin network.
+// currently active litecoin network.
 var activeNetParams = &mainNetParams
 
 // params is used to group parameters for various networks such as the main
@@ -62,7 +62,7 @@ var sigNetParams = params{
 	rpcPort: "38332",
 }
 
-// netName returns the name used when referring to a bitcoin network.  At the
+// netName returns the name used when referring to a litecoin network.  At the
 // time of writing, ltcd currently places blocks for testnet version 3 in the
 // data and log directory "testnet", which does not match the Name field of the
 // chaincfg parameters.  This function can be used to override this directory

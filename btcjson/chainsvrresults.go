@@ -108,7 +108,7 @@ type GetBlockVerboseTxResult struct {
 	VersionHex    string        `json:"versionHex"`
 	MerkleRoot    string        `json:"merkleroot"`
 	Tx            []TxRawResult `json:"tx,omitempty"`
-	RawTx         []TxRawResult `json:"rawtx,omitempty"` // Deprecated: removed in Bitcoin Core
+	RawTx         []TxRawResult `json:"rawtx,omitempty"` // Deprecated: removed in Litecoin Core
 	Time          int64         `json:"time"`
 	Nonce         uint32        `json:"nonce"`
 	Bits          string        `json:"bits"`
@@ -139,9 +139,10 @@ type CreateMultiSigResult struct {
 // DecodeScriptResult models the data returned from the decodescript command.
 type DecodeScriptResult struct {
 	Asm       string   `json:"asm"`
-	ReqSigs   int32    `json:"reqSigs,omitempty"`
+	ReqSigs   int32    `json:"reqSigs,omitempty"` // Deprecated: removed in Litecoin Core
 	Type      string   `json:"type"`
-	Addresses []string `json:"addresses,omitempty"`
+	Address   string   `json:"address,omitempty"`
+	Addresses []string `json:"addresses,omitempty"` // Deprecated: removed in Litecoin Core
 	P2sh      string   `json:"p2sh,omitempty"`
 }
 
@@ -198,7 +199,7 @@ type SoftForks struct {
 }
 
 // UnifiedSoftForks describes a softforks in a general manner, irrespective of
-// its activation type. This was a format introduced by bitcoind v0.19.0
+// its activation type. This was a format introduced by litecoind v0.19.0
 type UnifiedSoftFork struct {
 	Type                    string                   `json:"type"`
 	BIP9SoftForkDescription *Bip9SoftForkDescription `json:"bip9"`
@@ -208,7 +209,7 @@ type UnifiedSoftFork struct {
 
 // UnifiedSoftForks describes the current softforks enabled the by the backend
 // in a unified manner, i.e, softforks with different activation types are
-// grouped together. This was a format introduced by bitcoind v0.19.0
+// grouped together. This was a format introduced by litecoind v0.19.0
 type UnifiedSoftForks struct {
 	SoftForks map[string]*UnifiedSoftFork `json:"softforks"`
 }
@@ -429,9 +430,10 @@ type GetRawMempoolVerboseResult struct {
 type ScriptPubKeyResult struct {
 	Asm       string   `json:"asm"`
 	Hex       string   `json:"hex,omitempty"`
-	ReqSigs   int32    `json:"reqSigs,omitempty"`
+	ReqSigs   int32    `json:"reqSigs,omitempty"` // Deprecated: removed in Litecoin Core
 	Type      string   `json:"type"`
-	Addresses []string `json:"addresses,omitempty"`
+	Address   string   `json:"address,omitempty"`
+	Addresses []string `json:"addresses,omitempty"` // Deprecated: removed in Litecoin Core
 }
 
 // GetTxOutResult models the data from the gettxout command.
@@ -756,8 +758,8 @@ type TxRawDecodeResult struct {
 // ValidateAddressChainResult models the data returned by the chain server
 // validateaddress command.
 //
-// Compared to the Bitcoin Core version, this struct lacks the scriptPubKey
-// field since it requires wallet access, which is outside the scope of btcd.
+// Compared to the Litecoin Core version, this struct lacks the scriptPubKey
+// field since it requires wallet access, which is outside the scope of ltcd.
 // Ref: https://bitcoincore.org/en/doc/0.20.0/rpc/util/validateaddress/
 type ValidateAddressChainResult struct {
 	IsValid        bool    `json:"isvalid"`

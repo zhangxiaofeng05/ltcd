@@ -3,9 +3,9 @@
 // license that can be found in the LICENSE file.
 
 /*
-Package connmgr implements a generic Bitcoin network connection manager.
+Package connmgr implements a generic Litecoin network connection manager.
 
-Connection Manager Overview
+# Connection Manager Overview
 
 Connection Manager handles all the general connection concerns such as
 maintaining a set number of outbound connections, sourcing peers, banning,

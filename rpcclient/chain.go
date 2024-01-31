@@ -84,7 +84,7 @@ func (c *Client) waitForGetBlockRes(respChan chan *Response, hash string,
 	res, err := ReceiveFuture(respChan)
 
 	// If we receive an invalid parameter error, then we may be
-	// communicating with a btcd node which only understands the legacy
+	// communicating with a ltcd node which only understands the legacy
 	// request, so we'll try that.
 	if err, ok := err.(*btcjson.RPCError); ok &&
 		err.Code == btcjson.ErrRPCInvalidParams.Code {
@@ -195,7 +195,7 @@ func (c *Client) GetBlockVerboseAsync(blockHash *chainhash.Hash) FutureGetBlockV
 	if blockHash != nil {
 		hash = blockHash.String()
 	}
-	// From the bitcoin-cli getblock documentation:
+	// From the litecoin-cli getblock documentation:
 	// "If verbosity is 1, returns an Object with information about block ."
 	cmd := btcjson.NewGetBlockCmd(hash, btcjson.Int(1))
 	return FutureGetBlockVerboseResult{
@@ -250,7 +250,7 @@ func (c *Client) GetBlockVerboseTxAsync(blockHash *chainhash.Hash) FutureGetBloc
 		hash = blockHash.String()
 	}
 
-	// From the bitcoin-cli getblock documentation:
+	// From the litecoin-cli getblock documentation:
 	//
 	// If verbosity is 2, returns an Object with information about block
 	// and information about each transaction.
@@ -441,7 +441,7 @@ func unmarshalGetBlockChainInfoResultSoftForks(chainInfo *btcjson.GetBlockChainI
 	version BackendVersion, res []byte) error {
 
 	switch version {
-	// Versions of bitcoind on or after v0.19.0 use the unified format.
+	// Versions of litecoind on or after v0.19.0 use the unified format.
 	case BitcoindPost19:
 		var softForks btcjson.UnifiedSoftForks
 		if err := json.Unmarshal(res, &softForks); err != nil {
@@ -848,7 +848,7 @@ func (c *Client) EstimateFeeAsync(numBlocks int64) FutureEstimateFeeResult {
 	return c.SendCmd(cmd)
 }
 
-// EstimateFee provides an estimated fee  in bitcoins per kilobyte.
+// EstimateFee provides an estimated fee  in litecoins per kilobyte.
 func (c *Client) EstimateFee(numBlocks int64) (float64, error) {
 	return c.EstimateFeeAsync(numBlocks).Receive()
 }

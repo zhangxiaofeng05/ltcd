@@ -18,6 +18,7 @@ func TestServiceFlagStringer(t *testing.T) {
 		{SFNodeBloom, "SFNodeBloom"},
 		{SFNodeWitness, "SFNodeWitness"},
 		{SFNodeCF, "SFNodeCF"},
+		{SFNodeNetworkLimited, "SFNodeNetworkLimited"},
 		{0xffffffff, "SFNodeNetwork|SFNodeGetUTXO|SFNodeBloom|SFNodeWitness|SFNodeCF|SFNodeNetworkLimited|SFNodeMWEB|0xfefffbb0"},
 	}
 

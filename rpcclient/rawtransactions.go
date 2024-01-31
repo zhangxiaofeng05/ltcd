@@ -17,7 +17,7 @@ import (
 
 const (
 	// defaultMaxFeeRate is the default maximum fee rate in sat/KB enforced
-	// by bitcoind v0.19.0 or after for transaction broadcast.
+	// by litecoind v0.19.0 or after for transaction broadcast.
 	defaultMaxFeeRate = ltcutil.SatoshiPerBitcoin / 10
 )
 
@@ -32,7 +32,7 @@ const (
 
 	// SigHashNone indicates NONE of the outputs should be signed.  This
 	// can be thought of as specifying the signer does not care where the
-	// bitcoins go.
+	// litecoins go.
 	SigHashNone SigHashType = "NONE"
 
 	// SigHashSingle indicates that a SINGLE output should be signed.  This
@@ -359,10 +359,10 @@ func (c *Client) SendRawTransactionAsync(tx *wire.MsgTx, allowHighFees bool) Fut
 
 	var cmd *btcjson.SendRawTransactionCmd
 	switch version {
-	// Starting from bitcoind v0.19.0, the MaxFeeRate field should be used.
+	// Starting from litecoind v0.19.0, the MaxFeeRate field should be used.
 	case BitcoindPost19:
 		// Using a 0 MaxFeeRate is interpreted as a maximum fee rate not
-		// being enforced by bitcoind.
+		// being enforced by litecoind.
 		var maxFeeRate int32
 		if !allowHighFees {
 			maxFeeRate = defaultMaxFeeRate

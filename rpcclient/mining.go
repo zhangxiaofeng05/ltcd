@@ -456,7 +456,7 @@ func (c *Client) SubmitBlockAsync(block *ltcutil.Block, options *btcjson.SubmitB
 	return c.SendCmd(cmd)
 }
 
-// SubmitBlock attempts to submit a new block into the bitcoin network.
+// SubmitBlock attempts to submit a new block into the litecoin network.
 func (c *Client) SubmitBlock(block *ltcutil.Block, options *btcjson.SubmitBlockOptions) error {
 	return c.SubmitBlockAsync(block, options).Receive()
 }

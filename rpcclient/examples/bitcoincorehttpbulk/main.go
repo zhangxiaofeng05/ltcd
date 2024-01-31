@@ -12,14 +12,14 @@ import (
 )
 
 func main() {
-	// Connect to local bitcoin core RPC server using HTTP POST mode.
+	// Connect to local litecoin core RPC server using HTTP POST mode.
 	connCfg := &rpcclient.ConnConfig{
-		Host:                "localhost:8332",
+		Host:                "localhost:9332",
 		User:                "yourrpcuser",
 		Pass:                "yourrpcpass",
 		DisableConnectOnNew: true,
-		HTTPPostMode:        true, // Bitcoin core only supports HTTP POST mode
-		DisableTLS:          true, // Bitcoin core does not provide TLS by default
+		HTTPPostMode:        true, // Litecoin core only supports HTTP POST mode
+		DisableTLS:          true, // Litecoin core does not provide TLS by default
 	}
 	batchClient, err := rpcclient.NewBatch(connCfg)
 	defer batchClient.Shutdown()

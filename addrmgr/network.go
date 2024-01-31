@@ -20,7 +20,7 @@ var (
 		ipNet("192.168.0.0", 16, 32),
 	}
 
-	// rfc2544Net specifies the the IPv4 block as defined by RFC2544
+	// rfc2544Net specifies the IPv4 block as defined by RFC2544
 	// (198.18.0.0/15)
 	rfc2544Net = ipNet("198.18.0.0", 15, 32)
 
@@ -72,7 +72,7 @@ var (
 	rfc6598Net = ipNet("100.64.0.0", 10, 32)
 
 	// onionCatNet defines the IPv6 address block used to support Tor.
-	// bitcoind encodes a .onion address as a 16 byte number by decoding the
+	// litecoind encodes a .onion address as a 16 byte number by decoding the
 	// address prior to the .onion (i.e. the key hash) base32 into a ten
 	// byte number. It then stores the first 6 bytes of the address as
 	// 0xfd, 0x87, 0xd8, 0x7e, 0xeb, 0x43.
@@ -110,7 +110,7 @@ func IsLocal(na *wire.NetAddress) bool {
 }
 
 // IsOnionCatTor returns whether or not the passed address is in the IPv6 range
-// used by bitcoin to support Tor (fd87:d87e:eb43::/48).  Note that this range
+// used by litecoin to support Tor (fd87:d87e:eb43::/48).  Note that this range
 // is the same range used by OnionCat, which is part of the RFC4193 unique local
 // IPv6 range.
 func IsOnionCatTor(na *wire.NetAddress) bool {
@@ -287,7 +287,7 @@ func GroupKey(na *wire.NetAddressV2) string {
 	}
 
 	// OK, so now we know ourselves to be a IPv6 address.
-	// bitcoind uses /32 for everything, except for Hurricane Electric's
+	// litecoind uses /32 for everything, except for Hurricane Electric's
 	// (he.net) IP range, which it uses /36 for.
 	bits := 32
 	if heNet.Contains(lna.IP) {

@@ -22,7 +22,6 @@
    3. [Wallet](#Wallet)
 4. [Contact](#Contact)
    1. [Email](#ContactEmail)
-   2. [Mailing Lists](#MailingLists)
 5. [Developer Resources](#DeveloperResources)
    1. [Code Contribution Guidelines](#ContributionGuidelines)
    2. [JSON-RPC Reference](#JSONRPCReference)
@@ -63,7 +62,7 @@ directly with ltcd. That functionality is provided by the
 
 <a name="GettingStarted" />
 
-### 2. Getting Started
+[Go](http://golang.org) 1.17 or newer.
 
 <a name="Installation" />
 
@@ -241,15 +240,6 @@ information.
 **4.1 Email**
 
 - losh11@litecoin.net - maintainers email.
-
-<a name="MailingLists" />
-
-**4.2 Mailing Lists**
-
-- <a href="mailto:ltcd+subscribe@opensource.conformal.com">btcd</a>: discussion
-  of btcd and its packages.
-- <a href="mailto:ltcd-commits+subscribe@opensource.conformal.com">btcd-commits</a>:
-  readonly mail-out of source code changes.
 
 <a name="DeveloperResources" />
 

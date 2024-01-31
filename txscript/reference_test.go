@@ -79,7 +79,7 @@ func parseWitnessStack(elements []interface{}) ([][]byte, error) {
 // parsing.  It is declared here so it only needs to be created once.
 var shortFormOps map[string]byte
 
-// parseShortForm parses a string as as used in the Bitcoin Core reference tests
+// parseShortForm parses a string as as used in the Litecoin Core reference tests
 // into the script it came from.
 //
 // The format used for these tests is pretty simple if ad-hoc:
@@ -832,7 +832,7 @@ testloop:
 	}
 }
 
-// TestCalcSignatureHash runs the Bitcoin Core signature hash calculation tests
+// TestCalcSignatureHash runs the Litecoin Core signature hash calculation tests
 // in sighash.json.
 // https://github.com/bitcoin/bitcoin/blob/master/src/test/data/sighash.json
 func TestCalcSignatureHash(t *testing.T) {
@@ -1027,8 +1027,8 @@ func executeTaprootRefTest(t *testing.T, testCase taprootJsonTest) {
 
 // TestTaprootReferenceTests test that we're able to properly validate (success
 // and failure paths for each test) the set of functional generative tests
-// created by the bitcoind project for taproot at:
-// https://github.com/bitcoin/bitcoin/blob/master/test/functional/feature_taproot.py.
+// created by the litecoind project for taproot at:
+// https://github.com/litecoin-project/litecoin/blob/master/test/functional/feature_taproot.py.
 func TestTaprootReferenceTests(t *testing.T) {
 	t.Parallel()
 

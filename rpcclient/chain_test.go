@@ -15,25 +15,25 @@ func TestUnmarshalGetBlockChainInfoResultSoftForks(t *testing.T) {
 		compatible bool
 	}{
 		{
-			name:       "bitcoind < 0.19.0 with separate softforks",
+			name:       "litecoind < 0.19.0 with separate softforks",
 			version:    BitcoindPre19,
 			res:        []byte(`{"softforks": [{"version": 2}]}`),
 			compatible: true,
 		},
 		{
-			name:       "bitcoind >= 0.19.0 with separate softforks",
+			name:       "litecoind >= 0.19.0 with separate softforks",
 			version:    BitcoindPost19,
 			res:        []byte(`{"softforks": [{"version": 2}]}`),
 			compatible: false,
 		},
 		{
-			name:       "bitcoind < 0.19.0 with unified softforks",
+			name:       "litecoind < 0.19.0 with unified softforks",
 			version:    BitcoindPre19,
 			res:        []byte(`{"softforks": {"segwit": {"type": "bip9"}}}`),
 			compatible: false,
 		},
 		{
-			name:       "bitcoind >= 0.19.0 with unified softforks",
+			name:       "litecoind >= 0.19.0 with unified softforks",
 			version:    BitcoindPost19,
 			res:        []byte(`{"softforks": {"segwit": {"type": "bip9"}}}`),
 			compatible: true,

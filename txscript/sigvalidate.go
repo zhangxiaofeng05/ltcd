@@ -16,7 +16,7 @@ import (
 
 // signatureVerifier is an abstract interface that allows the op code execution
 // to abstract over the _type_ of signature validation being executed. At this
-// point in Bitcoin's history, there're four possible sig validation contexts:
+// point in Litecoin's history, there're four possible sig validation contexts:
 // pre-segwit, segwit v0, segwit v1 (taproot key spend validation), and the
 // base tapscript verification.
 type signatureVerifier interface {

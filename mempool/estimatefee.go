@@ -59,7 +59,7 @@ var (
 // SatoshiPerByte is number with units of satoshis per byte.
 type SatoshiPerByte float64
 
-// BtcPerKilobyte is number with units of bitcoins per kilobyte.
+// BtcPerKilobyte is number with units of litecoins per kilobyte.
 type BtcPerKilobyte float64
 
 // ToBtcPerKb returns a float value that represents the given

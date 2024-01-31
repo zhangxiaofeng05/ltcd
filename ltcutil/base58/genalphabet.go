@@ -2,7 +2,8 @@
 // Use of this source code is governed by an ISC
 // license that can be found in the LICENSE file.
 
-//+build ignore
+//go:build ignore
+// +build ignore
 
 package main
 
@@ -24,7 +25,7 @@ var (
 package base58
 
 const (
-	// alphabet is the modified base58 alphabet used by Bitcoin.
+	// alphabet is the modified base58 alphabet used by Litecoin.
 	alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 
 	alphabetIdx0 = '1'

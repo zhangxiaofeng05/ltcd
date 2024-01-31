@@ -6,11 +6,12 @@ package rpcclient
 
 import (
 	"fmt"
+
 	"github.com/ltcsuite/ltcd/btcjson"
 )
 
 var connCfg = &ConnConfig{
-	Host:         "localhost:8332",
+	Host:         "localhost:9332",
 	User:         "user",
 	Pass:         "pass",
 	HTTPPostMode: true,

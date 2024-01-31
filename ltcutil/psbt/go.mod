@@ -27,4 +27,7 @@ require (
 
 replace github.com/ltcsuite/ltcd/ltcutil => ../
 
-replace github.com/ltcsuite/ltcd => ../..
+replace github.com/ltcsuite/ltcd => ../../
+
+replace github.com/ltcsuite/ltcd/btcec/v2 => ../../btcec
+replace github.com/ltcsuite/ltcd/chaincfg/chainhash => ../../chaincfg/chainhash

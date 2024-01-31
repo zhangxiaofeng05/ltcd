@@ -107,19 +107,19 @@ type jsonRequest struct {
 type BackendVersion uint8
 
 const (
-	// BitcoindPre19 represents a bitcoind version before 0.19.0.
+	// BitcoindPre19 represents a litecoind version before 0.19.0.
 	BitcoindPre19 BackendVersion = iota
 
-	// BitcoindPost19 represents a bitcoind version equal to or greater than
+	// BitcoindPost19 represents a litecoind version equal to or greater than
 	// 0.19.0.
 	BitcoindPost19
 
-	// Btcd represents a catch-all btcd version.
+	// Btcd represents a catch-all ltcd version.
 	Btcd
 )
 
-// Client represents a Bitcoin RPC client which allows easy access to the
-// various RPC methods available on a Bitcoin RPC server.  Each of the wrapper
+// Client represents a Litecoin RPC client which allows easy access to the
+// various RPC methods available on a Litecoin RPC server.  Each of the wrapper
 // functions handle the details of converting the passed and return types to and
 // from the underlying JSON types which are required for the JSON-RPC
 // invocations
@@ -761,9 +761,7 @@ out:
 // handleSendPostMessage handles performing the passed HTTP request, reading the
 // result, unmarshalling it, and delivering the unmarshalled result to the
 // provided response channel.
-func (c *Client) handleSendPostMessage(jReq *jsonRequest,
-	shutdown chan struct{}) {
-
+func (c *Client) handleSendPostMessage(jReq *jsonRequest) {
 	protocol := "http"
 	if !c.config.DisableTLS {
 		protocol = "https"
@@ -825,7 +823,7 @@ func (c *Client) handleSendPostMessage(jReq *jsonRequest,
 		select {
 		case <-time.After(backoff):
 
-		case <-shutdown:
+		case <-c.shutdown:
 			return
 		}
 	}
@@ -893,7 +891,7 @@ out:
 		// is closed.
 		select {
 		case jReq := <-c.sendPostChan:
-			c.handleSendPostMessage(jReq, c.shutdown)
+			c.handleSendPostMessage(jReq)
 
 		case <-c.shutdown:
 			break out
@@ -917,7 +915,6 @@ cleanup:
 	}
 	c.wg.Done()
 	log.Tracef("RPC client send handler done for %s", c.config.Host)
-
 }
 
 // sendPostRequest sends the passed HTTP request to the RPC server using the
@@ -931,9 +928,13 @@ func (c *Client) sendPostRequest(jReq *jsonRequest) {
 	default:
 	}
 
-	log.Tracef("Sending command [%s] with id %d", jReq.method, jReq.id)
+	select {
+	case c.sendPostChan <- jReq:
+		log.Tracef("Sent command [%s] with id %d", jReq.method, jReq.id)
 
-	c.sendPostChan <- jReq
+	case <-c.shutdown:
+		return
+	}
 }
 
 // newFutureError returns a new future result channel that already has the
@@ -1502,7 +1503,7 @@ func New(config *ConnConfig, ntfnHandlers *NotificationHandlers) (*Client, error
 // Batch is a factory that creates a client able to interact with the server using
 // JSON-RPC 2.0. The client is capable of accepting an arbitrary number of requests
 // and having the server process the all at the same time. It's compatible with both
-// btcd and bitcoind
+// ltcd and litecoind
 func NewBatch(config *ConnConfig) (*Client, error) {
 	if !config.HTTPPostMode {
 		return nil, errors.New("http post mode is required to use batch client")
@@ -1575,15 +1576,15 @@ func (c *Client) Connect(tries int) error {
 }
 
 const (
-	// bitcoind19Str is the string representation of bitcoind v0.19.0.
+	// bitcoind19Str is the string representation of litecoind v0.19.0.
 	bitcoind19Str = "0.19.0"
 
-	// bitcoindVersionSuffix specifies the suffix included in every bitcoind
+	// bitcoindVersionSuffix specifies the suffix included in every litecoind
 	// version exposed through GetNetworkInfo.
 	bitcoindVersionSuffix = "/"
 )
 
-// parseBitcoindVersion parses the bitcoind version from its string
+// parseBitcoindVersion parses the litecoind version from its string
 // representation.
 func parseBitcoindVersion(version string) BackendVersion {
 	// Find the first ":" and trim everything before that
@@ -1615,14 +1616,14 @@ func (c *Client) BackendVersion() (BackendVersion, error) {
 	}
 
 	// We'll start by calling GetInfo. This method doesn't exist for
-	// bitcoind nodes as of v0.16.0, so we'll assume the client is connected
-	// to a btcd backend if it does exist.
+	// litecoind nodes as of v0.16.0, so we'll assume the client is connected
+	// to a ltcd backend if it does exist.
 	info, err := c.GetInfo()
 
 	switch err := err.(type) {
-	// Parse the btcd version and cache it.
+	// Parse the ltcd version and cache it.
 	case nil:
-		log.Debugf("Detected btcd version: %v", info.Version)
+		log.Debugf("Detected ltcd version: %v", info.Version)
 		version := Btcd
 		c.backendVersion = &version
 		return *c.backendVersion, nil
@@ -1631,24 +1632,24 @@ func (c *Client) BackendVersion() (BackendVersion, error) {
 	// we actually ran into an error.
 	case *btcjson.RPCError:
 		if err.Code != btcjson.ErrRPCMethodNotFound.Code {
-			return 0, fmt.Errorf("unable to detect btcd version: "+
+			return 0, fmt.Errorf("unable to detect ltcd version: "+
 				"%v", err)
 		}
 
 	default:
-		return 0, fmt.Errorf("unable to detect btcd version: %v", err)
+		return 0, fmt.Errorf("unable to detect ltcd version: %v", err)
 	}
 
 	// Since the GetInfo method was not found, we assume the client is
-	// connected to a bitcoind backend, which exposes its version through
+	// connected to a litecoind backend, which exposes its version through
 	// GetNetworkInfo.
 	networkInfo, err := c.GetNetworkInfo()
 	if err != nil {
-		return 0, fmt.Errorf("unable to detect bitcoind version: %v", err)
+		return 0, fmt.Errorf("unable to detect litecoind version: %v", err)
 	}
 
-	// Parse the bitcoind version and cache it.
-	log.Debugf("Detected bitcoind version: %v", networkInfo.SubVersion)
+	// Parse the litecoind version and cache it.
+	log.Debugf("Detected litecoind version: %v", networkInfo.SubVersion)
 	version := parseBitcoindVersion(networkInfo.SubVersion)
 	c.backendVersion = &version
 

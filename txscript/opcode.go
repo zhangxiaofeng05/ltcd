@@ -34,7 +34,7 @@ type opcode struct {
 }
 
 // These constants are the values of the official opcodes used on the btc wiki,
-// in bitcoin core and in most if not all other references and software related
+// in litecoin core and in most if not all other references and software related
 // to handling BTC scripts.
 const (
 	OP_0                   = 0x00 // 0
@@ -291,12 +291,12 @@ const (
 	OP_UNKNOWN247          = 0xf7 // 247
 	OP_UNKNOWN248          = 0xf8 // 248
 	OP_UNKNOWN249          = 0xf9 // 249
-	OP_SMALLINTEGER        = 0xfa // 250 - bitcoin core internal
-	OP_PUBKEYS             = 0xfb // 251 - bitcoin core internal
+	OP_SMALLINTEGER        = 0xfa // 250 - litecoin core internal
+	OP_PUBKEYS             = 0xfb // 251 - litecoin core internal
 	OP_UNKNOWN252          = 0xfc // 252
-	OP_PUBKEYHASH          = 0xfd // 253 - bitcoin core internal
-	OP_PUBKEY              = 0xfe // 254 - bitcoin core internal
-	OP_INVALIDOPCODE       = 0xff // 255 - bitcoin core internal
+	OP_PUBKEYHASH          = 0xfd // 253 - litecoin core internal
+	OP_PUBKEY              = 0xfe // 254 - litecoin core internal
+	OP_INVALIDOPCODE       = 0xff // 255 - litecoin core internal
 )
 
 // Conditional execution constants.
@@ -578,7 +578,7 @@ var opcodeArray = [256]opcode{
 	OP_UNKNOWN248: {OP_UNKNOWN248, "OP_UNKNOWN248", 1, opcodeInvalid},
 	OP_UNKNOWN249: {OP_UNKNOWN249, "OP_UNKNOWN249", 1, opcodeInvalid},
 
-	// Bitcoin Core internal use opcode.  Defined here for completeness.
+	// Litecoin Core internal use opcode.  Defined here for completeness.
 	OP_SMALLINTEGER: {OP_SMALLINTEGER, "OP_SMALLINTEGER", 1, opcodeInvalid},
 	OP_PUBKEYS:      {OP_PUBKEYS, "OP_PUBKEYS", 1, opcodeInvalid},
 	OP_UNKNOWN252:   {OP_UNKNOWN252, "OP_UNKNOWN252", 1, opcodeInvalid},
@@ -1073,7 +1073,7 @@ func opcodeCheckLockTimeVerify(op *opcode, data []byte, vm *Engine) error {
 	if err != nil {
 		return err
 	}
-	lockTime, err := makeScriptNum(so, vm.dstack.verifyMinimalData, 5)
+	lockTime, err := MakeScriptNum(so, vm.dstack.verifyMinimalData, 5)
 	if err != nil {
 		return err
 	}
@@ -1147,7 +1147,7 @@ func opcodeCheckSequenceVerify(op *opcode, data []byte, vm *Engine) error {
 	if err != nil {
 		return err
 	}
-	stackSequence, err := makeScriptNum(so, vm.dstack.verifyMinimalData, 5)
+	stackSequence, err := MakeScriptNum(so, vm.dstack.verifyMinimalData, 5)
 	if err != nil {
 		return err
 	}
@@ -1171,7 +1171,7 @@ func opcodeCheckSequenceVerify(op *opcode, data []byte, vm *Engine) error {
 
 	// Transaction version numbers not high enough to trigger CSV rules must
 	// fail.
-	if vm.tx.Version < 2 {
+	if uint32(vm.tx.Version) < 2 {
 		str := fmt.Sprintf("invalid transaction version: %d",
 			vm.tx.Version)
 		return scriptError(ErrUnsatisfiedLockTime, str)

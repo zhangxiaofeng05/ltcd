@@ -121,7 +121,7 @@ type Harness struct {
 // New creates and initializes new instance of the rpc test harness.
 // Optionally, websocket handlers and a specified configuration may be passed.
 // In the case that a nil config is passed, a default configuration will be
-// used. If a custom btcd executable is specified, it will be used to start the
+// used. If a custom ltcd executable is specified, it will be used to start the
 // harness node. Otherwise a new binary is built on demand.
 //
 // NOTE: This function is safe for concurrent access.

@@ -646,7 +646,7 @@ func NewGetRawMempoolCmd(verbose *bool) *GetRawMempoolCmd {
 
 // GetRawTransactionCmd defines the getrawtransaction JSON-RPC command.
 //
-// NOTE: This field is an int versus a bool to remain compatible with Bitcoin
+// NOTE: This field is an int versus a bool to remain compatible with Litecoin
 // Core even though it really should be a bool.
 type GetRawTransactionCmd struct {
 	Txid    string
@@ -891,7 +891,7 @@ func NewSendRawTransactionCmd(hexTx string, allowHighFees *bool) *SendRawTransac
 }
 
 // NewSendRawTransactionCmd returns a new instance which can be used to issue a
-// sendrawtransaction JSON-RPC command to a bitcoind node.
+// sendrawtransaction JSON-RPC command to a litecoind node.
 //
 // A 0 maxFeeRate indicates that a maximum fee rate won't be enforced.
 func NewBitcoindSendRawTransactionCmd(hexTx string, maxFeeRate int32) *SendRawTransactionCmd {

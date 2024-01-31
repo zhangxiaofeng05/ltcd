@@ -20,7 +20,7 @@ func ExampleAmount() {
 	// Output:
 	// Zero Satoshi: 0 LTC
 	// 100,000,000 Satoshis: 1 LTC
-	// 100,000 Satoshis: 0.001 LTC
+	// 100,000 Satoshis: 0.00100000 LTC
 }
 
 func ExampleNewAmount() {
@@ -69,7 +69,7 @@ func ExampleAmount_unitConversions() {
 
 	// Output:
 	// Satoshi to kLTC: 444.333222111 kLTC
-	// Satoshi to LTC: 444333.222111 LTC
+	// Satoshi to LTC: 444333.22211100 LTC
 	// Satoshi to MilliLTC: 444333222.111 mLTC
 	// Satoshi to MicroLTC: 444333222111 μLTC
 	// Satoshi to Litoshi: 44433322211100 Litoshi

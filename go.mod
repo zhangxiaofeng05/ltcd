@@ -34,5 +34,7 @@ require (
 )
 
 replace github.com/ltcsuite/ltcd/ltcutil => ./ltcutil
+replace github.com/ltcsuite/ltcd/chaincfg/chainhash => ./chaincfg/chainhash
+replace github.com/ltcsuite/ltcd/btcec/v2 => ./btcec
 
 go 1.17

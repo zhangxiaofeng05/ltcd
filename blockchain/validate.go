@@ -227,7 +227,7 @@ func CheckTransactionSanity(tx *ltcutil.Tx) error {
 	// output must not be negative or more than the max allowed per
 	// transaction.  Also, the total of all outputs must abide by the same
 	// restrictions.  All amounts in a transaction are in a unit value known
-	// as a satoshi.  One bitcoin is a quantity of satoshi as defined by the
+	// as a satoshi.  One litecoin is a quantity of satoshi as defined by the
 	// SatoshiPerBitcoin constant.
 	var totalSatoshi int64
 	for _, txOut := range msgTx.TxOut {
@@ -245,7 +245,7 @@ func CheckTransactionSanity(tx *ltcutil.Tx) error {
 		}
 
 		// Two's complement int64 overflow guarantees that any overflow
-		// is detected and reported.  This is impossible for Bitcoin, but
+		// is detected and reported.  This is impossible for Litecoin, but
 		// perhaps possible if an alt increases the total money supply.
 		totalSatoshi += satoshi
 		if totalSatoshi < 0 {
@@ -421,13 +421,15 @@ func CountP2SHSigOps(tx *ltcutil.Tx, isCoinBaseTx bool, utxoView *UtxoViewpoint)
 	return totalSigOps, nil
 }
 
-// checkBlockHeaderSanity performs some preliminary checks on a block header to
+// CheckBlockHeaderSanity performs some preliminary checks on a block header to
 // ensure it is sane before continuing with processing.  These checks are
 // context free.
 //
 // The flags do not modify the behavior of this function directly, however they
 // are needed to pass along to checkProofOfWork.
-func checkBlockHeaderSanity(header *wire.BlockHeader, powLimit *big.Int, timeSource MedianTimeSource, flags BehaviorFlags) error {
+func CheckBlockHeaderSanity(header *wire.BlockHeader, powLimit *big.Int,
+	timeSource MedianTimeSource, flags BehaviorFlags) error {
+
 	// Ensure the proof of work bits in the block header is in min/max range
 	// and the block hash is less than the target value described by the
 	// bits.
@@ -467,7 +469,7 @@ func checkBlockHeaderSanity(header *wire.BlockHeader, powLimit *big.Int, timeSou
 func checkBlockSanity(block *ltcutil.Block, powLimit *big.Int, timeSource MedianTimeSource, flags BehaviorFlags) error {
 	msgBlock := block.MsgBlock()
 	header := &msgBlock.Header
-	err := checkBlockHeaderSanity(header, powLimit, timeSource, flags)
+	err := CheckBlockHeaderSanity(header, powLimit, timeSource, flags)
 	if err != nil {
 		return err
 	}
@@ -524,15 +526,14 @@ func checkBlockSanity(block *ltcutil.Block, powLimit *big.Int, timeSource Median
 	// Build merkle tree and ensure the calculated merkle root matches the
 	// entry in the block header.  This also has the effect of caching all
 	// of the transaction hashes in the block to speed up future hash
-	// checks.  Bitcoind builds the tree here and checks the merkle root
+	// checks.  Litecoind builds the tree here and checks the merkle root
 	// after the following checks, but there is no reason not to check the
 	// merkle root matches here.
-	merkles := BuildMerkleTreeStore(block.Transactions(), false)
-	calculatedMerkleRoot := merkles[len(merkles)-1]
-	if !header.MerkleRoot.IsEqual(calculatedMerkleRoot) {
+	calcMerkleRoot := CalcMerkleRoot(block.Transactions(), false)
+	if !header.MerkleRoot.IsEqual(&calcMerkleRoot) {
 		str := fmt.Sprintf("block merkle root is invalid - block "+
 			"header indicates %v, but calculated value is %v",
-			header.MerkleRoot, calculatedMerkleRoot)
+			header.MerkleRoot, calcMerkleRoot)
 		return ruleError(ErrBadMerkleRoot, str)
 	}
 
@@ -633,22 +634,30 @@ func checkSerializedHeight(coinbaseTx *ltcutil.Tx, wantHeight int32) error {
 	return nil
 }
 
-// checkBlockHeaderContext performs several validation checks on the block header
+// CheckBlockHeaderContext performs several validation checks on the block header
 // which depend on its position within the block chain.
 //
 // The flags modify the behavior of this function as follows:
 //   - BFFastAdd: All checks except those involving comparing the header against
 //     the checkpoints are not performed.
 //
+// The skipCheckpoint boolean is used so that libraries can skip the checkpoint
+// sanity checks.
+//
 // This function MUST be called with the chain state lock held (for writes).
-func (b *BlockChain) checkBlockHeaderContext(header *wire.BlockHeader, prevNode *blockNode, flags BehaviorFlags) error {
+// NOTE: Ignore the above lock requirement if this function is not passed a
+// *Blockchain instance as the ChainCtx argument.
+func CheckBlockHeaderContext(header *wire.BlockHeader, prevNode HeaderCtx,
+	flags BehaviorFlags, c ChainCtx, skipCheckpoint bool) error {
+
 	fastAdd := flags&BFFastAdd == BFFastAdd
 	if !fastAdd {
 		// Ensure the difficulty specified in the block header matches
 		// the calculated difficulty based on the previous block and
 		// difficulty retarget rules.
-		expectedDifficulty, err := b.calcNextRequiredDifficulty(prevNode,
-			header.Timestamp)
+		expectedDifficulty, err := calcNextRequiredDifficulty(
+			prevNode, header.Timestamp, c,
+		)
 		if err != nil {
 			return err
 		}
@@ -661,7 +670,7 @@ func (b *BlockChain) checkBlockHeaderContext(header *wire.BlockHeader, prevNode 
 
 		// Ensure the timestamp for the block header is after the
 		// median time of the last several blocks (medianTimeBlocks).
-		medianTime := prevNode.CalcPastMedianTime()
+		medianTime := CalcPastMedianTime(prevNode)
 		if !header.Timestamp.After(medianTime) {
 			str := "block timestamp of %v is not after expected %v"
 			str = fmt.Sprintf(str, header.Timestamp, medianTime)
@@ -671,11 +680,30 @@ func (b *BlockChain) checkBlockHeaderContext(header *wire.BlockHeader, prevNode 
 
 	// The height of this block is one more than the referenced previous
 	// block.
-	blockHeight := prevNode.height + 1
+	blockHeight := prevNode.Height() + 1
+
+	// Reject outdated block versions once a majority of the network
+	// has upgraded.  These were originally voted on by BIP0034,
+	// BIP0065, and BIP0066.
+	params := c.ChainParams()
+	if header.Version < 2 && blockHeight >= params.BIP0034Height ||
+		header.Version < 3 && blockHeight >= params.BIP0066Height ||
+		header.Version < 4 && blockHeight >= params.BIP0065Height {
+
+		str := "new blocks with version %d are no longer valid"
+		str = fmt.Sprintf(str, header.Version)
+		return ruleError(ErrBlockVersionTooOld, str)
+	}
+
+	if skipCheckpoint {
+		// If the caller wants us to skip the checkpoint checks, we'll
+		// return early.
+		return nil
+	}
 
 	// Ensure chain matches up to predetermined checkpoints.
 	blockHash := header.BlockHash()
-	if !b.verifyCheckpoint(blockHeight, &blockHash) {
+	if !c.VerifyCheckpoint(blockHeight, &blockHash) {
 		str := fmt.Sprintf("block at height %d does not match "+
 			"checkpoint hash", blockHeight)
 		return ruleError(ErrBadCheckpoint, str)
@@ -685,28 +713,15 @@ func (b *BlockChain) checkBlockHeaderContext(header *wire.BlockHeader, prevNode 
 	// chain before it.  This prevents storage of new, otherwise valid,
 	// blocks which build off of old blocks that are likely at a much easier
 	// difficulty and therefore could be used to waste cache and disk space.
-	checkpointNode, err := b.findPreviousCheckpoint()
+	checkpointNode, err := c.FindPreviousCheckpoint()
 	if err != nil {
 		return err
 	}
-	if checkpointNode != nil && blockHeight < checkpointNode.height {
+	if checkpointNode != nil && blockHeight < checkpointNode.Height() {
 		str := fmt.Sprintf("block at height %d forks the main chain "+
 			"before the previous checkpoint at height %d",
-			blockHeight, checkpointNode.height)
+			blockHeight, checkpointNode.Height())
 		return ruleError(ErrForkTooOld, str)
-	}
-
-	// Reject outdated block versions once a majority of the network
-	// has upgraded.  These were originally voted on by BIP0034,
-	// BIP0065, and BIP0066.
-	params := b.chainParams
-	if header.Version < 2 && blockHeight >= params.BIP0034Height ||
-		header.Version < 3 && blockHeight >= params.BIP0066Height ||
-		header.Version < 4 && blockHeight >= params.BIP0065Height {
-
-		str := "new blocks with version %d are no longer valid"
-		str = fmt.Sprintf(str, header.Version)
-		return ruleError(ErrBlockVersionTooOld, str)
 	}
 
 	return nil
@@ -726,7 +741,7 @@ func (b *BlockChain) checkBlockHeaderContext(header *wire.BlockHeader, prevNode 
 func (b *BlockChain) checkBlockContext(block *ltcutil.Block, prevNode *blockNode, flags BehaviorFlags) error {
 	// Perform all block header related validation checks.
 	header := &block.MsgBlock().Header
-	err := b.checkBlockHeaderContext(header, prevNode, flags)
+	err := CheckBlockHeaderContext(header, prevNode, flags, b, false)
 	if err != nil {
 		return err
 	}
@@ -746,7 +761,7 @@ func (b *BlockChain) checkBlockContext(block *ltcutil.Block, prevNode *blockNode
 		// timestamps for all lock-time based checks.
 		blockTime := header.Timestamp
 		if csvState == ThresholdActive {
-			blockTime = prevNode.CalcPastMedianTime()
+			blockTime = CalcPastMedianTime(prevNode)
 		}
 
 		// The height of this block is one more than the referenced
@@ -832,22 +847,22 @@ func (b *BlockChain) checkBlockContext(block *ltcutil.Block, prevNode *blockNode
 func (b *BlockChain) checkBIP0030(node *blockNode, block *ltcutil.Block, view *UtxoViewpoint) error {
 	// Fetch utxos for all of the transaction ouputs in this block.
 	// Typically, there will not be any utxos for any of the outputs.
-	fetchSet := make(map[wire.OutPoint]struct{})
+	fetch := make([]wire.OutPoint, 0, len(block.Transactions()))
 	for _, tx := range block.Transactions() {
 		prevOut := wire.OutPoint{Hash: *tx.Hash()}
 		for txOutIdx := range tx.MsgTx().TxOut {
 			prevOut.Index = uint32(txOutIdx)
-			fetchSet[prevOut] = struct{}{}
+			fetch = append(fetch, prevOut)
 		}
 	}
-	err := view.fetchUtxos(b.db, fetchSet)
+	err := view.fetchUtxos(b.db, fetch)
 	if err != nil {
 		return err
 	}
 
 	// Duplicate transactions are only allowed if the previous transaction
 	// is fully spent.
-	for outpoint := range fetchSet {
+	for _, outpoint := range fetch {
 		utxo := view.LookupEntry(outpoint)
 		if utxo != nil && !utxo.IsSpent() {
 			str := fmt.Sprintf("tried to overwrite transaction %v "+
@@ -866,7 +881,7 @@ func (b *BlockChain) checkBIP0030(node *blockNode, block *ltcutil.Block, view *U
 // requirements are met, detecting double spends, validating all values and fees
 // are in the legal range and the total output amount doesn't exceed the input
 // amount, and verifying the signatures to prove the spender was the owner of
-// the bitcoins and therefore allowed to spend them.  As it checks the inputs,
+// the litecoins and therefore allowed to spend them.  As it checks the inputs,
 // it also calculates the total fees for the transaction and returns that value.
 //
 // NOTE: The transaction MUST have already been sanity checked with the
@@ -910,7 +925,7 @@ func CheckTransactionInputs(tx *ltcutil.Tx, txHeight int32, utxoView *UtxoViewpo
 		// output values of the input transactions must not be negative
 		// or more than the max allowed per transaction.  All amounts in
 		// a transaction are in a unit value known as a satoshi.  One
-		// bitcoin is a quantity of satoshi as defined by the
+		// litecoin is a quantity of satoshi as defined by the
 		// SatoshiPerBitcoin constant.
 		originTxSatoshi := utxo.Amount()
 		if originTxSatoshi < 0 {
@@ -957,7 +972,7 @@ func CheckTransactionInputs(tx *ltcutil.Tx, txHeight int32, utxoView *UtxoViewpo
 		return 0, ruleError(ErrSpendTooHigh, str)
 	}
 
-	// NOTE: bitcoind checks if the transaction fees are < 0 here, but that
+	// NOTE: litecoind checks if the transaction fees are < 0 here, but that
 	// is an impossible condition because of the check above that ensures
 	// the inputs are >= the outputs.
 	txFeeInSatoshi := totalSatoshiIn - totalSatoshiOut
@@ -1186,7 +1201,7 @@ func (b *BlockChain) checkConnectBlock(node *blockNode, block *ltcutil.Block, vi
 
 		// We obtain the MTP of the *previous* block in order to
 		// determine if transactions in the current block are final.
-		medianTime := node.parent.CalcPastMedianTime()
+		medianTime := CalcPastMedianTime(node.parent)
 
 		// Additionally, if the CSV soft-fork package is now active,
 		// then we also enforce the relative sequence number based
@@ -1288,3 +1303,68 @@ func (b *BlockChain) CheckConnectBlockTemplate(block *ltcutil.Block) error {
 	newNode := newBlockNode(&header, tip)
 	return b.checkConnectBlock(newNode, block, view, nil)
 }
+
+// ChainParams returns the Blockchain's configured chaincfg.Params.
+//
+// NOTE: Part of the ChainCtx interface.
+func (b *BlockChain) ChainParams() *chaincfg.Params {
+	return b.chainParams
+}
+
+// BlocksPerRetarget returns the number of blocks before retargeting occurs.
+//
+// NOTE: Part of the ChainCtx interface.
+func (b *BlockChain) BlocksPerRetarget() int32 {
+	return b.blocksPerRetarget
+}
+
+// MinRetargetTimespan returns the minimum amount of time to use in the
+// difficulty calculation.
+//
+// NOTE: Part of the ChainCtx interface.
+func (b *BlockChain) MinRetargetTimespan() int64 {
+	return b.minRetargetTimespan
+}
+
+// MaxRetargetTimespan returns the maximum amount of time to use in the
+// difficulty calculation.
+//
+// NOTE: Part of the ChainCtx interface.
+func (b *BlockChain) MaxRetargetTimespan() int64 {
+	return b.maxRetargetTimespan
+}
+
+// VerifyCheckpoint checks that the height and hash match the stored
+// checkpoints.
+//
+// NOTE: Part of the ChainCtx interface.
+func (b *BlockChain) VerifyCheckpoint(height int32,
+	hash *chainhash.Hash) bool {
+
+	return b.verifyCheckpoint(height, hash)
+}
+
+// FindPreviousCheckpoint finds the checkpoint we've encountered during
+// validation.
+//
+// NOTE: Part of the ChainCtx interface.
+func (b *BlockChain) FindPreviousCheckpoint() (HeaderCtx, error) {
+	checkpoint, err := b.findPreviousCheckpoint()
+	if err != nil {
+		return nil, err
+	}
+
+	if checkpoint == nil {
+		// This check is necessary because if we just return the nil
+		// blockNode as a HeaderCtx, a caller performing a nil-check
+		// will fail. This is a quirk of go where a nil value stored in
+		// an interface is different from the actual nil interface.
+		return nil, nil
+	}
+
+	return checkpoint, err
+}
+
+// A compile-time assertion to ensure BlockChain implements the ChainCtx
+// interface.
+var _ ChainCtx = (*BlockChain)(nil)

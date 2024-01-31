@@ -1254,7 +1254,7 @@ func TestChainSvrCmds(t *testing.T) {
 			},
 		},
 		{
-			name: "sendrawtransaction optional, bitcoind >= 0.19.0",
+			name: "sendrawtransaction optional, litecoind >= 0.19.0",
 			newCmd: func() (interface{}, error) {
 				return btcjson.NewCmd("sendrawtransaction", "1122", &btcjson.AllowHighFeesOrMaxFeeRate{Value: btcjson.Int32(1234)})
 			},
