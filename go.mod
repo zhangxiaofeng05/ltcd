@@ -10,9 +10,9 @@ require (
 	github.com/decred/dcrd/lru v1.0.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jrick/logrotate v1.0.0
-	github.com/ltcsuite/ltcd/btcec/v2 v2.1.3
+	github.com/ltcsuite/ltcd/btcec/v2 v2.3.2
 	github.com/ltcsuite/ltcd/chaincfg/chainhash v1.0.2
-	github.com/ltcsuite/ltcd/ltcutil v1.1.0
+	github.com/ltcsuite/ltcd/ltcutil v1.1.3
 	github.com/stretchr/testify v1.8.0
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
@@ -32,9 +32,5 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/ltcsuite/ltcd/ltcutil => ./ltcutil
-replace github.com/ltcsuite/ltcd/chaincfg/chainhash => ./chaincfg/chainhash
-replace github.com/ltcsuite/ltcd/btcec/v2 => ./btcec
 
 go 1.17

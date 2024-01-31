@@ -4,10 +4,10 @@ go 1.17
 
 require (
 	github.com/davecgh/go-spew v1.1.1
-	github.com/ltcsuite/ltcd v0.23.4
-	github.com/ltcsuite/ltcd/btcec/v2 v2.1.3
+	github.com/ltcsuite/ltcd v0.23.5
+	github.com/ltcsuite/ltcd/btcec/v2 v2.3.2
 	github.com/ltcsuite/ltcd/chaincfg/chainhash v1.0.2
-	github.com/ltcsuite/ltcd/ltcutil v1.1.0
+	github.com/ltcsuite/ltcd/ltcutil v1.1.3
 	github.com/stretchr/testify v1.8.0
 )
 
@@ -24,10 +24,3 @@ require (
 	gotest.tools v2.2.0+incompatible // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
 )
-
-replace github.com/ltcsuite/ltcd/ltcutil => ../
-
-replace github.com/ltcsuite/ltcd => ../../
-
-replace github.com/ltcsuite/ltcd/btcec/v2 => ../../btcec
-replace github.com/ltcsuite/ltcd/chaincfg/chainhash => ../../chaincfg/chainhash
