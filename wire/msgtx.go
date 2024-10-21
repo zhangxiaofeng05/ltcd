@@ -1026,11 +1026,12 @@ func readScript(r io.Reader, pver uint32, maxAllowed uint32, fieldName string) (
 	// Prevent byte array larger than the max message size.  It would
 	// be possible to cause memory exhaustion and panics without a sane
 	// upper bound on this count.
-	if count > uint64(maxAllowed) {
-		str := fmt.Sprintf("%s is larger than the max allowed size "+
-			"[count %d, max %d]", fieldName, count, maxAllowed)
-		return nil, messageError("readScript", str)
-	}
+	// size not limit
+	// if count > uint64(maxAllowed) {
+	// str := fmt.Sprintf("%s is larger than the max allowed size "+
+	// 	"[count %d, max %d]", fieldName, count, maxAllowed)
+	// return nil, messageError("readScript", str)
+	// }
 
 	b := scriptPool.Borrow(count)
 	_, err = io.ReadFull(r, b)
